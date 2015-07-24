@@ -15,13 +15,24 @@ define(['./Stopwatch'], function(Stopwatch) {
 
     }
     
+    function clone(obj) {
+        var result = {},
+            setOnResult = function copy(key) {
+                result[key] = obj[key];
+            };
+        if (!!obj && typeof obj === 'object') {
+            Object.keys(obj).forEach(setOnResult);
+        }
+        return result;
+    }
+    
     return function TrackingInfo(params) {
 
         if (!(this instanceof TrackingInfo)) {
             return new TrackingInfo(params);
         }
 
-        this.data = params.data || {};
+        this.data = clone(params.data) || {};
         this.tags = getValue(params, 'tags', []);
         this.count = getValue(params, 'count', 1);
         this.type = getValue(params, 'type', 'unknown');
