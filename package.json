@@ -1,0 +1,25 @@
+{
+  "name": "Tracking",
+  "version": "0.0.0",
+  "description": "Provides various tracking metrics for JavaScript applications.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/daninnewyork/Tracking.git"
+  },
+  "keywords": [
+    "tracking"
+  ],
+  "author": "Dan Barnes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daninnewyork/Tracking/issues"
+  },
+  "homepage": "https://github.com/daninnewyork/Tracking",
+  "dependencies": {
+    "requirejs": "^2.1.19"
+  }
+}
