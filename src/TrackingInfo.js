@@ -16,14 +16,9 @@ define(['./Stopwatch'], function(Stopwatch) {
     }
     
     function clone(obj) {
-        var result = {},
-            setOnResult = function copy(key) {
-                result[key] = obj[key];
-            };
-        if (!!obj && typeof obj === 'object') {
-            Object.keys(obj).forEach(setOnResult);
-        }
-        return result;
+        return Object.keys(obj).reduce(function copy(result, key) {
+            return result[key] = obj[key], result;
+        }, {});
     }
     
     return function TrackingInfo(params) {
