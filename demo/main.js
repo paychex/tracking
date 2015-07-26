@@ -11,8 +11,15 @@ define(['Tracking'], function(Tracking) {
             console.log(info.toString());
         }
     });
+    
+    var removeDecorator = Tracking.collectors.decorate(function(info) {
+        info.data.sessionId = 'someSessionId';
+        if (info.category === 'metrics') {
+            info.tags.push('analytics');
+        }
+    });
 
-    Tracking.events.fire('click', {label: 'button clicked'});
+    Tracking.events.fire('click', {label: 'button clicked', misc: 'hello'});
     Tracking.events.fire('load', {category: 'DOM', label: 'site loaded'});
 
     Tracking.events.fire('count', {
@@ -31,6 +38,12 @@ define(['Tracking'], function(Tracking) {
             parent.start();
         
             Tracking.marks.set('timers.started', {category: 'timers'});
+            
+            if (count === 1) {
+                Tracking.collectors.enable();
+            } else if (count === 3) {
+                Tracking.collectors.disable();
+            }
         
             setTimeout(function() {
                 child.start();
@@ -51,7 +64,9 @@ define(['Tracking'], function(Tracking) {
                 Tracking.marks.measure('timers.duration', 'timers.started', 'timers.stopped', {tags: ['performance']});
         
                 if (++count >= 5) {
+                    Tracking.collectors.enable();
                     removeCollector();
+                    removeDecorator();
                     clearInterval(token);
                 }
         
