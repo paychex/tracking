@@ -99,6 +99,15 @@ define([
 
         };
         
+        Marks.start = function start(name, data) {
+            Marks.set('Start: ' + name, data);
+        };
+
+        Marks.stop = function stop(name, data) {
+            Marks.set('Stop: ' + name, data);
+            Marks.measure(name, 'Start: ' + name, 'Stop: ' + name);
+        };
+        
         Marks.measure = function measure(name, start, stop, data) {
 
             [name, start, stop].forEach(function validateArgument(value) {

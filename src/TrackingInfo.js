@@ -27,7 +27,7 @@ define(['./Stopwatch'], function(Stopwatch) {
             return new TrackingInfo(params);
         }
 
-        this.data = clone(params.data) || {};
+        this.data = clone(params.data || {});
         this.tags = getValue(params, 'tags', []);
         this.count = getValue(params, 'count', 1);
         this.type = getValue(params, 'type', 'unknown');

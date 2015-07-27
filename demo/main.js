@@ -28,6 +28,8 @@ define(['Tracking'], function(Tracking) {
         tags: ['ui', 'navigation'],
         variable: Math.random() * 20 >>> 0
     });
+    
+    Tracking.marks.start('setInterval');
 
     var count = 0,
         parent = Tracking.timers.create('parent'),
@@ -64,6 +66,7 @@ define(['Tracking'], function(Tracking) {
                 Tracking.marks.measure('timers.duration', 'timers.started', 'timers.stopped', {tags: ['performance']});
         
                 if (++count >= 5) {
+                    Tracking.marks.stop('setInterval');
                     Tracking.collectors.enable();
                     removeCollector();
                     removeDecorator();

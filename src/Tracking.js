@@ -3,11 +3,13 @@ define([
     './mixins/Events',
     './mixins/Timers',
     './mixins/Marks',
+    './mixins/Network',
     './mixins/Collectors'
 ], function(
     Events,
     Timers,
     Marks,
+    Network,
     Collectors
 ) {
     
@@ -19,10 +21,11 @@ define([
         Tracking[name] = constructor(Tracking);
     }
     
+    mixin('collectors', Collectors);
     mixin('events', Events);
     mixin('timers', Timers);
     mixin('marks', Marks);
-    mixin('collectors', Collectors);
+    mixin('network', Network);
     
     return Tracking;
     
