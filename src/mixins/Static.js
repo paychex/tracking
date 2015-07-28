@@ -32,18 +32,18 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         Static.setMetric = function setMetric(name, value) {
             metrics[name] = value;
             Tracking.collectors.collect(new TrackingInfo({
-                type: 'metric',
                 label: name,
-                variable: value.toString()
+                type: 'metric',
+                variable: value == null ? value : value.toString()
             }));
         };
 
         Static.setDimension = function setDimension(name, value) {
             dimensions[name] = value;
             Tracking.collectors.collect(new TrackingInfo({
-                type: 'dimension',
                 label: name,
-                variable: value.toString()
+                type: 'dimension',
+                variable: value == null ? value : value.toString()
             }));
         };
         

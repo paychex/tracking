@@ -57,7 +57,7 @@ define([
 
         },
 
-        polyMeasure = function measure(name, start, stop, data) {
+        polyMeasure = function measure(name, start, stop, data, between) {
 
             var instance,
                 mark1 = marks.reverse().reduce(hasLabel(start), null),
@@ -74,7 +74,13 @@ define([
                     duration: mark2.stop - mark1.stop,
                     count: measures.reduce(getCounter(name), 1)
                 };
-                
+
+                if (!!between) {
+                    instance.children = marks.filter(function isBetween(mark) {
+                        return mark.stop >= mark1.stop && mark.stop <= mark2.stop;
+                    });
+                }
+
                 measures.push(instance);
                 
                 if (!!window.performance) {
@@ -103,12 +109,12 @@ define([
             Marks.set('Start: ' + name, data);
         };
 
-        Marks.stop = function stop(name, data) {
+        Marks.stop = function stop(name, data, between) {
             Marks.set('Stop: ' + name, data);
-            Marks.measure(name, 'Start: ' + name, 'Stop: ' + name);
+            Marks.measure(name, 'Start: ' + name, 'Stop: ' + name, null, between);
         };
         
-        Marks.measure = function measure(name, start, stop, data) {
+        Marks.measure = function measure(name, start, stop, data, between) {
 
             [name, start, stop].forEach(function validateArgument(value) {
                 if (typeof value !== 'string' || !value.length) {
@@ -116,7 +122,7 @@ define([
                 }
             });
             
-            var instance = polyMeasure(name, start, stop, data);
+            var instance = polyMeasure(name, start, stop, data, between);
             if (!!instance) {
                 Tracking.collectors.collect(new TrackingInfo(instance));
             }

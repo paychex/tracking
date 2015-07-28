@@ -49,6 +49,7 @@ define(['Tracking'], function(Tracking) {
             
             if (count === 1) {
                 Tracking.collectors.enable();
+                Tracking.static.setDimension('eligible-for-upgrade');
             } else if (count === 3) {
                 Tracking.collectors.disable();
             }
@@ -68,11 +69,11 @@ define(['Tracking'], function(Tracking) {
                 child.stop({variable: 'variable'});
                 parent.stop({tags: ['bagged', 'and', 'tagged']});
         
-                Tracking.marks.set('timers.stopped', {category: 'timers'});
+                Tracking.marks.set('timers.stopped', {category: 'timers', custom: 'data'});
                 Tracking.marks.measure('timers.duration', 'timers.started', 'timers.stopped', {tags: ['performance']});
         
                 if (++count >= 5) {
-                    Tracking.marks.stop('setInterval');
+                    Tracking.marks.stop('setInterval', null, true);
                     Tracking.collectors.enable();
                     removeCollector();
                     removeDecorator();
