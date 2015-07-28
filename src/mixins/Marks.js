@@ -60,8 +60,8 @@ define([
         polyMeasure = function measure(name, start, stop, data) {
 
             var instance,
-                mark1 = marks.reduce(hasLabel(start), null),
-                mark2 = marks.reduce(hasLabel(stop), null);
+                mark1 = marks.reverse().reduce(hasLabel(start), null),
+                mark2 = marks.reverse().reduce(hasLabel(stop), null);
             
             if (!!mark1 && !!mark2) {
             
