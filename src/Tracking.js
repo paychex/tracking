@@ -4,12 +4,14 @@ define([
     './mixins/Timers',
     './mixins/Marks',
     './mixins/Network',
+    './mixins/Static',
     './mixins/Collectors'
 ], function(
     Events,
     Timers,
     Marks,
     Network,
+    Static,
     Collectors
 ) {
     
@@ -25,6 +27,7 @@ define([
     mixin('events', Events);
     mixin('timers', Timers);
     mixin('marks', Marks);
+    mixin('static', Static);
     mixin('network', Network);
     
     return Tracking;

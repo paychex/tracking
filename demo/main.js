@@ -22,13 +22,18 @@ define(['Tracking'], function(Tracking) {
     Tracking.events.fire('click', {label: 'button clicked', misc: 'hello'});
     Tracking.events.fire('load', {category: 'DOM', label: 'site loaded'});
 
+    Tracking.static.setContext('main');
+    Tracking.static.setMetric('uid', 'username');
+
     Tracking.events.fire('count', {
         category: 'metrics',
         label: 'site navigation',
         tags: ['ui', 'navigation'],
         variable: Math.random() * 20 >>> 0
     });
-    
+
+    Tracking.static.setDimension('eligible-for-upgrade', true);
+
     Tracking.marks.start('setInterval');
 
     var count = 0,
@@ -38,7 +43,8 @@ define(['Tracking'], function(Tracking) {
         token = setInterval(function() {
         
             parent.start();
-        
+
+            Tracking.static.setContext('loop #' + count);
             Tracking.marks.set('timers.started', {category: 'timers'});
             
             if (count === 1) {

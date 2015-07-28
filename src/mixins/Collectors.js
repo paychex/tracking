@@ -33,7 +33,7 @@ define([], function() {
             collectors.splice(collectors.indexOf(collector), 1);
         };
 
-        Collectors.decorate = function decorate(decorator) {
+        Collectors.decorate = function addDecorator(decorator) {
             if (typeof decorator !== 'function') {
                 throw new Error('Parameter `decorator` must be a function.');
             }
