@@ -13,11 +13,11 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             
             getTimingInfo = function getTimingInfo(timing) {
                 return new TrackingInfo({
-                    category: 'network',
+                    type: 'network',
                     label: timing.name,
-                    type: timing.initiatorType,
                     start: timing.startTime,
                     stop: timing.responseEnd,
+                    category: timing.initiatorType,
                     count: resourceCounts[timing.name] = (resourceCounts[timing.name] || 0) + 1,
                     data: {
                         size: timing.transferSize, // NOTE: not all browsers provide transferSize
