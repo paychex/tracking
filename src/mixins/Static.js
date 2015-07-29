@@ -34,7 +34,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             Tracking.collectors.collect(new TrackingInfo({
                 label: name,
                 type: 'metric',
-                variable: value == null ? value : value.toString()
+                variable: value
             }));
         };
 

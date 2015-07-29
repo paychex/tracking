@@ -34,10 +34,10 @@ define(['./Stopwatch'], function(Stopwatch) {
         this.start = getValue(params, 'start', 'startTime', Stopwatch.now());
         this.stop = getValue(params, 'stop', 'stopTime', this.start);
         this.duration = this.stop - this.start;
-        this.label = getValue(params, 'label', '');
-        this.action = getValue(params, 'action', '');
-        this.category = getValue(params, 'category', '');
-        this.variable = getValue(params, 'variable', '');
+        this.label = getValue(params, 'label', undefined);
+        this.action = getValue(params, 'action', undefined);
+        this.category = getValue(params, 'category', undefined);
+        this.variable = getValue(params, 'variable', undefined);
         this.children = getValue(params, 'children', []).map(TrackingInfo);
         
         Object.keys(this).forEach(function(key) {
