@@ -3,6 +3,30 @@ define(['./Stopwatch'], function(Stopwatch) {
     
     'use strict';
     
+    function getRandomValues(count) {
+        var rands, d;
+        if (crypto && crypto.getRandomValues) {
+            rands = new Uint8Array(count);
+            crypto.getRandomValues(rands);
+        } else {
+            rands = new Array(count);
+            d = new Date().getTime();
+            while (count--) {
+                rands[count] = (d + Math.random() * 16) & 15;
+            }
+        }
+        return rands;
+    }
+
+    function generateUUID() {
+        var values = getRandomValues(36);
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+            .replace(/[xy]/g, function(c, i) {
+                var r = values[i] & 15;
+                return (c === 'x' ? r : (r & 0x3|0x8)).toString(16);
+            });
+    }
+
     function getValue(params) {
 
         var args = [].slice.call(arguments),
@@ -27,6 +51,7 @@ define(['./Stopwatch'], function(Stopwatch) {
             return new TrackingInfo(params);
         }
 
+        this.id = generateUUID();
         this.data = clone(params.data || {});
         this.tags = getValue(params, 'tags', []);
         this.count = getValue(params, 'count', 1);
