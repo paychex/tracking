@@ -26,6 +26,15 @@ define(['./Stopwatch'], function(Stopwatch) {
                 return (c === 'x' ? r : (r & 0x3|0x8)).toString(16);
             });
     }
+    
+    function firstDefined() {
+        var args = [].slice.call(arguments),
+            result = args.shift();
+        while (args.length && result === undefined) {
+            result = args.shift();
+        }
+        return result;
+    }
 
     function getValue(params) {
 
@@ -34,7 +43,7 @@ define(['./Stopwatch'], function(Stopwatch) {
             names = args.slice(1);
         
         return names.reduce(function (prev, name) {
-            return (params.data || {})[name] || params[name] || prev;
+            return firstDefined((params.data || {})[name], params[name], prev);
         }, def);
 
     }
@@ -51,11 +60,11 @@ define(['./Stopwatch'], function(Stopwatch) {
             return new TrackingInfo(params);
         }
 
-        this.id = generateUUID();
         this.data = clone(params.data || {});
         this.tags = getValue(params, 'tags', []);
         this.count = getValue(params, 'count', 1);
         this.type = getValue(params, 'type', 'unknown');
+        this.id = getValue(params, 'id', undefined) || generateUUID();
         this.start = getValue(params, 'start', 'startTime', Stopwatch.now());
         this.stop = getValue(params, 'stop', 'stopTime', this.start);
         this.duration = this.stop - this.start;
