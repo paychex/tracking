@@ -1,4 +1,4 @@
-/* global define: false */
+/* global define, crypto, Uint8Array: false */
 define(['./Stopwatch'], function(Stopwatch) {
     
     'use strict';

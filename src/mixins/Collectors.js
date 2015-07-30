@@ -11,8 +11,9 @@ define([], function() {
             collectors = [],
             decorators = [],
             
-            decorate = function decorate(result, decorate) {
-                return result = decorate(result) || result;
+            decorate = function decorate(result, decorator) {
+                /* jshint -W093 */
+                return result = decorator(result) || result;
             },
             
             persist = function persist(info) {
@@ -40,7 +41,7 @@ define([], function() {
             decorators.push(decorator);
             return function removeDecorator() {
                 decorators.splice(decorators.indexOf(decorator), 1);
-            }
+            };
         };
 
         Collectors.enable = function enable() {

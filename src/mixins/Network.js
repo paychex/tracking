@@ -1,4 +1,4 @@
-/* global define: false */
+/* global define, performance, setInterval: false */
 define(['../TrackingInfo'], function(TrackingInfo) {
     
     'use strict';

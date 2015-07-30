@@ -43,6 +43,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             Tracking.collectors.collect(new TrackingInfo({
                 label: name,
                 type: 'dimension',
+                /* jshint -W041 */
                 variable: value == null ? value : value.toString()
             }));
         };
