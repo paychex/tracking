@@ -76,7 +76,7 @@ define([
 
         Timer.prototype.start = function start() {
             if (this.state === Timer.States.STARTED) {
-                throw new Error('Invalid Operation: Timer already started.');
+                throw new Error('Invalid Operation: Timer `' + this.label + '` already started.');
             }
             this.reset();
             this.startTime = Stopwatch.now();
@@ -85,7 +85,7 @@ define([
 
         Timer.prototype.stop = function stop(data) {
             if (this.state !== Timer.States.STARTED) {
-                throw new Error('Invalid Operation: Timer not started.');
+                throw new Error('Invalid Operation: Timer `' + this.label + '` not started.');
             }
             validate(this);
             this.data = data;
