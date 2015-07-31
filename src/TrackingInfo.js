@@ -54,24 +54,115 @@ define(['./Stopwatch'], function(Stopwatch) {
         }, {});
     }
     
+    /**
+     * Encapsulates the tracking information provided by all
+     * tracking sources into a single consistent schema for
+     * consumption by collectors.
+     * @class TrackingInfo
+     * @param {Object} params An object whose properties will
+     *  be examined to set properties on the TrackingInfo
+     *  instance.
+     * @example
+     * var info = new TrackingInfo({
+     *   type: 'event',
+     *   action: 'click',
+     *   label: 'custom label'
+     * });
+     */
     return function TrackingInfo(params) {
 
         if (!(this instanceof TrackingInfo)) {
             return new TrackingInfo(params);
         }
 
+        /**
+         * @member {Object} [data] Any optional data
+         *  associated with the current instance.
+         */
         this.data = clone(params.data || {});
+
+        /**
+         * @member {Array} [tags] Any optional strings
+         *  to associate with the current instance.
+         */
         this.tags = getValue(params, 'tags', []);
+
+        /**
+         * @member {Number} [count=1] Typically used to
+         *  indicate the number of times an event,
+         *  mark, or measure has been collected.
+         */
         this.count = getValue(params, 'count', 1);
+
+        /**
+         * @member {String} [type="unknown"] The type
+         *  of this instance. Built-in types include
+         *  'event', 'timer', 'mark', 'measure',
+         *  'network', 'context', 'metric', and
+         *  'dimension'
+         */
         this.type = getValue(params, 'type', 'unknown');
+
+        /**
+         * @member {String} [id] The unique id to associate
+         *  with this instance. If not provided, a universally
+         *  unique identifier will be generated automatically.
+         */
         this.id = getValue(params, 'id', undefined) || generateUUID();
+
+        /**
+         * @member {Number} [start] The number of milliseconds since
+         *  1/1/1970 before this instance was started. If not
+         *  provided, defaults to the current date and time.
+         */
         this.start = getValue(params, 'start', 'startTime', Stopwatch.now());
+
+        /**
+         * @member {Number} [stop] The number of milliseconds since
+         *  1/1/1970 before this instance was stopped. If not
+         *  provided, defaults to the start time.
+         */
         this.stop = getValue(params, 'stop', 'stopTime', this.start);
+
+        /**
+         * @member {Number} [duration] The number of milliseconds
+         *  between this instance's stop time and start time.
+         */
         this.duration = this.stop - this.start;
+
+        /**
+         * @member {String} [label] The label to associate with
+         *  this instance. 
+         */
         this.label = getValue(params, 'label', undefined);
+
+        /**
+         * @member {String} [action] The action to associate with
+         *  this instance.
+         */
         this.action = getValue(params, 'action', undefined);
+
+        /**
+         * @member {String} [category] The category to associate
+         *  with this instance.
+         */
         this.category = getValue(params, 'category', undefined);
+
+        /**
+         * @member {*} [variable] Some custom value to associate
+         *  with this instance. Typically used in conjunction with
+         *  data events to register some conditional state of the
+         *  application (such as the number of options available
+         *  to the user at a given decision point).
+         */
         this.variable = getValue(params, 'variable', undefined);
+
+        /**
+         * @member {Array} [children] Contains any nested TrackingInfo
+         *  instances. Timers and measures can both have children, but
+         *  technically any custom data object with a `children` array
+         *  will be attempted to be converted into TrackingInfo instances.
+         */
         this.children = getValue(params, 'children', []).map(TrackingInfo);
         
         Object.keys(this).forEach(function(key) {

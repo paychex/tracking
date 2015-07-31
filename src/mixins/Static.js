@@ -3,6 +3,12 @@ define(['../TrackingInfo'], function(TrackingInfo) {
     
     'use strict';
     
+    /**
+     * Sets metadata applicable to all {@see TrackingInfo} instances.
+     * This metadata will be added to any TrackingInfo instance prior
+     * to being persisted to registered collectors.
+     * @class Static
+     */
     return function Static(Tracking) {
 
         var context,
@@ -21,6 +27,17 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             info.data.dimensions = clone(dimensions);
         });
 
+        /**
+         * Sets the global context on future {@see TrackingInfo}
+         * instances before they are sent to any registered collectors.
+         * Typically, this would be the current "screen" of your
+         * application. Until provided, the default context is "none".
+         * @function Static.setContext
+         * @param {String} name The name of the context to set.
+         * @example
+         * Tracking.static.setContext('main');
+         * Tracking.events.fire('loading');
+         */
         Static.setContext = function setContext(name) {
             context = name;
             Tracking.collectors.collect(new TrackingInfo({
@@ -29,6 +46,19 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             }));
         };
 
+        /**
+         * Adds a new custom metric to the internal collection.
+         * Custom metrics will be added to future {@see TrackingInfo}
+         * instances automatically before persisting to collectors.
+         * @function Static.setMetric
+         * @param {String} name The name of the custom metric to set.
+         * @param {*} value The value to associate with the custom
+         *  metric. If `undefined`, the metric will no longer appear
+         *  in future TrackingInfo instances.
+         * @example
+         * Tracking.static.setMetric('mode', 'admin');
+         * Tracking.events.fire('applications loaded');
+         */
         Static.setMetric = function setMetric(name, value) {
             metrics[name] = value;
             Tracking.collectors.collect(new TrackingInfo({
@@ -38,6 +68,22 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             }));
         };
 
+        /**
+         * Adds a new custom dimension to the internal collection. A
+         * dimension represents some way you wish to segment your
+         * collected tracking data. Common examples are by product
+         * availability, geographic region, AB test group, etc.
+         * @function Static.setDimension
+         * @param {String} name The name of the custom dimension.
+         * @param {String|undefined} value The value to associate
+         *  with the new custom dimension. If `undefined`, the
+         *  dimension will no longer appear in future TrackingInfo
+         *  instances.
+         * @example
+         * Tracking.static.setDimension('region', 'northeast');
+         * Tracking.static.setDimension('support-level', 'gold');
+         * Tracking.events.fire('user data loaded');
+         */
         Static.setDimension = function setDimension(name, value) {
             dimensions[name] = value;
             Tracking.collectors.collect(new TrackingInfo({

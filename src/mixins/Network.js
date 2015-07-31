@@ -3,8 +3,22 @@ define(['../TrackingInfo'], function(TrackingInfo) {
     
     'use strict';
     
+    /**
+     * Automatically collects and persists resource timing data
+     * to any registered collectors. This includes anything
+     * downloaded by the site or by the user during his session.
+     * @class Network
+     */
     return function Network(Tracking) {
         
+        /**
+         * Returns an array any PerformanceTimingEntry instances
+         * collected by the web browser during the user's session.
+         * @function Network.getEntries
+         * @returns {Array} An array of PerformanceTimingEntry instances
+         *  collected by the browser. If the browser does not implement
+         *  the HTML5 Performance API, the array will always be empty.
+         */
         Network.getEntries = function getEntries() { return []; };
 
         var lastLength = 0,
