@@ -47,6 +47,19 @@ define([], function() {
             }, info.data));
         };
 
+    /**
+     * @class GoogleAnalytics
+     * @param {Object} [switches] An optional map of which
+     *  {@link TrackingInfo#type} values should be switched
+     *  off. By default, all timings will be persisted as
+     *  the most applicable GA hitType. See the examples.
+     * @example
+     * // all TrackingInfo types will be sent to GA
+     * var collector = new GoogleAnalytics();
+     * @example
+     * // network types (download timings) will NOT be persisted
+     * var collector = new GoogleAnalytics({ network: false });
+     */
     function GoogleAnalytics(switches) {
 
         this.methods = {

@@ -110,7 +110,7 @@ define([
          * @param {String} name The name of the mark to set.
          * @param {Object} [data] Optional properties to associate with
          *  the mark. This data will be used to provide properties to
-         *  the {@see TrackingInfo} instance persisted to collectors.
+         *  the {@link TrackingInfo} instance persisted to collectors.
          * @throws A mark name must be specified.
          * @example
          * Tracking.marks.set('app initialized');
@@ -129,12 +129,12 @@ define([
         /**
          * Creates a new mark whose name is prepended with "Start: ".
          * This method is meant to be called in conjunction with
-         * {@see Marks.stop} to create a pair of marks along with a
+         * {@link Marks.stop} to create a pair of marks along with a
          * measure between them.
          * @function Marks.start
          * @param {String} name The name of the mark to set.
          * @param {Object} [data] Optional data to use to set properties
-         *  on the {@see TrackingInfo} instance persisted to collectors.
+         *  on the {@link TrackingInfo} instance persisted to collectors.
          * @example
          * Tracking.marks.start('loading data');
          * $.getJSON('path/to/data')
@@ -149,13 +149,13 @@ define([
         /**
          * Creates a new mark whose name is prepended with "Stop: ".
          * This method is meant to be called in conjunction with
-         * {@see Marks.start} to create a pair of marks along with a
+         * {@link Marks.start} to create a pair of marks along with a
          * measure between them.
          * @function Marks.stop
          * @param {String} name The name of the mark to set. This should
-         *  match the name you passed to {@see Marks.start}.
+         *  match the name you passed to {@link Marks.start}.
          * @param {Object} [data] Optional data to use to set properties
-         *  on the {@see TrackingInfo} instance persisted to collectors.
+         *  on the {@link TrackingInfo} instance persisted to collectors.
          * @param {Boolean} [between=false] Whether or not to include
          *  any marks set between calls to start() and stop() as children
          *  of the TrackingInfo measure that will be sent to collectors.
@@ -178,11 +178,11 @@ define([
          * @param {String} start The name of the first mark.
          * @param {String} stop The name of the second mark.
          * @param {Object} [data] Optional object whose members will be
-         *  used to set properties on the {@see TrackingInfo} instance
+         *  used to set properties on the {@link TrackingInfo} instance
          *  sent to any registered collectors.
          * @param {Boolean} [between=false] Whether or not to include any
          *  marks set between the start and stop marks as children of the
-         *  {@see TrackingInfo} measure that will be sent to collectors.
+         *  {@link TrackingInfo} measure that will be sent to collectors.
          * @throws Parameters `name`, `start`, and `stop` are required.
          * @example
          * Tracking.marks.set('begin load');

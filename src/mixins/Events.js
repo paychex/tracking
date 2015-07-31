@@ -14,7 +14,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * @function Events.fire
          * @param {String} action The name of the action.
          * @param {Object} [data] Optional data whose members
-         *  will be used to set properties on the {@see TrackingInfo}
+         *  will be used to set properties on the {@link TrackingInfo}
          *  instance sent to any registered collectors.
          * @throws An event action must be specified.
          * @example

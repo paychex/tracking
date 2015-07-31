@@ -4,7 +4,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
     'use strict';
     
     /**
-     * Sets metadata applicable to all {@see TrackingInfo} instances.
+     * Sets metadata applicable to all {@link TrackingInfo} instances.
      * This metadata will be added to any TrackingInfo instance prior
      * to being persisted to registered collectors.
      * @class Static
@@ -28,7 +28,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         });
 
         /**
-         * Sets the global context on future {@see TrackingInfo}
+         * Sets the global context on future {@link TrackingInfo}
          * instances before they are sent to any registered collectors.
          * Typically, this would be the current "screen" of your
          * application. Until provided, the default context is "none".
@@ -48,7 +48,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
 
         /**
          * Adds a new custom metric to the internal collection.
-         * Custom metrics will be added to future {@see TrackingInfo}
+         * Custom metrics will be added to future {@link TrackingInfo}
          * instances automatically before persisting to collectors.
          * @function Static.setMetric
          * @param {String} name The name of the custom metric to set.

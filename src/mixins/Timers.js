@@ -13,7 +13,7 @@ define([
         states = ['PENDING', 'STARTED', 'STOPPED'];
     
     /**
-     * Factory class to create {@see Timer} instances.
+     * Factory class to create {@link Timer} instances.
      * @class Timers
      */
     return function Timers(Tracking) {
@@ -161,7 +161,7 @@ define([
          * Records the current time and places the Timer
          * into a stopped state. If optional data was provided,
          * it will be stored as well and used when constructing
-         * the associated {@see TimingInfo} instance. The
+         * the associated {@link TimingInfo} instance. The
          * Timer instance will be converted immediately into a
          * TrackingInfo instance and persisted to any registered
          * collectors.
@@ -219,7 +219,7 @@ define([
         };
 
         /**
-         * Creates a new top-level {@see Timer} instance (i.e.
+         * Creates a new top-level {@link Timer} instance (i.e.
          * a parent timer with no children) with the specified
          * name.
          * @function Timers.create
