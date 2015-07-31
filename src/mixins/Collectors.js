@@ -125,7 +125,7 @@ define([], function() {
          * will be cached until {@link Collectors.enable} is called
          * again. This is the default state of the {@link Collectors}
          * instance.
-         * @function Collectors.enable
+         * @function Collectors.disable
          */
         Collectors.disable = function disable() {
             isPaused = true;
