@@ -1,13 +1,13 @@
-/* global define, crypto, Uint8Array: false */
+/* global window, define, Uint8Array: false */
 define(['./Stopwatch'], function(Stopwatch) {
     
     'use strict';
     
     function getRandomValues(count) {
         var rands, d;
-        if (crypto && crypto.getRandomValues) {
+        if (window.crypto && window.crypto.getRandomValues) {
             rands = new Uint8Array(count);
-            crypto.getRandomValues(rands);
+            window.crypto.getRandomValues(rands);
         } else {
             rands = new Array(count);
             d = new Date().getTime();
