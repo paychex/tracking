@@ -1,5 +1,6 @@
 /* global define: false */
 define([
+    './mixins/Errors',
     './mixins/Events',
     './mixins/Timers',
     './mixins/Marks',
@@ -7,6 +8,7 @@ define([
     './mixins/Static',
     './mixins/Collectors'
 ], function(
+    Errors,
     Events,
     Timers,
     Marks,
@@ -14,9 +16,9 @@ define([
     Static,
     Collectors
 ) {
-    
+
     'use strict';
-    
+
     /**
      * Static class that provides access to various
      * tracking methods (events, timers, marks, etc.).
@@ -24,29 +26,32 @@ define([
      * @static
      */
     function Tracking() {}
-    
+
     function mixin(name, constructor) {
         Tracking[name] = constructor(Tracking);
     }
-    
+
     /** @member {Collectors} collectors */
     mixin('collectors', Collectors);
-    
+
+    /** @member {Errors} errors */
+    mixin('errors', Errors);
+
     /** @member {Events} events */
     mixin('events', Events);
-    
+
     /** @member {Timers} timers */
     mixin('timers', Timers);
-    
+
     /** @member {Marks} marks */
     mixin('marks', Marks);
-    
+
     /** @member {Static} static */
     mixin('static', Static);
-    
+
     /** @member {Network} network */
     mixin('network', Network);
-    
+
     return Tracking;
     
 });

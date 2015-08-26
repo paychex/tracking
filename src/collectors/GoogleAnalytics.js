@@ -37,6 +37,14 @@ define([], function() {
             }, info.data));
         },
 
+        sendException = function sendException(info) {
+            ga('send', merge({
+                'hitType': 'exception',
+                'exDescription': info.data.message,
+                'exFatal': info.data.severity === 'FATAL'
+            }, info.data));
+        },
+
         sendTimer = function sendTimer(info) {
             ga('send', merge({
                 'hitType': 'timer',
@@ -66,6 +74,7 @@ define([], function() {
             'context': setContext,
             'metric': setValue,
             'dimension': setValue,
+            'error': sendException,
             'event': sendEvent,
             'timer': sendTimer,
             'mark': sendTimer,
