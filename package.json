@@ -1,13 +1,13 @@
 {
   "name": "Tracking",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Provides various tracking metrics for JavaScript applications.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "doc": "./node_modules/.bin/jsdoc -d build/dev/doc -r -P ./package.json src",
-    "build:dev": "r.js.cmd -o optimize=none baseUrl=. paths.lodash=empty: paths.angular=empty: shim.angular.eports=angular shim.lodash.exports=_ name=index out=build/cm.js",
-    "build:prod": "r.js.cmd -o baseUrl=. paths.lodash=empty: paths.angular=empty: shim.angular.eports=angular shim.lodash.exports=_ name=index out=build/cm.min.js",
+    "build:dev": "r.js.cmd -o optimize=none baseUrl=src name=../node_modules/almond/almond include=Tracking out=build/tracking.js wrap.startFile=wrap.start.txt wrap.endFile=wrap.end.txt",
+    "build:prod": "r.js.cmd -o baseUrl=src name=../node_modules/almond/almond include=Tracking out=build/tracking.min.js wrap.startFile=wrap.start.txt wrap.endFile=wrap.end.txt",
     "build": "npm run-script build:dev && npm run-script build:prod"
   },
   "repository": {
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/daninnewyork/Tracking",
   "dependencies": {
+    "almond": "^0.3.1",
     "jsdoc": "^3.3.0-alpha10",
     "requirejs": "^2.1.19"
   }

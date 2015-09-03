@@ -1,7 +1,9 @@
 /* global require, define, console: false */
 /* jshint browser: true */
 require.config({
-    baseUrl: '../src'
+    paths: {
+        Tracking: '../build/tracking'
+    }
 });
 
 define(['Tracking'], function(Tracking) {
