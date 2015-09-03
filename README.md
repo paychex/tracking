@@ -35,7 +35,31 @@ session id to the custom data field so it shows in log entries.
 
 ### Installation ###
 
-TODO
+To build the Tracking library, run `npm run-script build` from the command line.
+
+At this point, you can open demo/index.html in a browser, open the developer console, and inspect the output. Output
+should appear after about 10 seconds. Look in demo/main.js for sample code.
+
+To include the Tracking library in your own applications, simply reference the built file:
+
+    require.config({
+        paths: {
+            Tracking: 'path/to/tracking'
+        }
+    });
+
+Then you can inject the Tracking library using code like the following:
+
+    define(['Tracking'], function(Tracking) {
+        Tracking.marks.set('script loaded', {label: 'my script name'});
+    });
+
+Or, for node:
+
+    var Tracking = require('path/to/tracking');
+    Tracking.events.fire('script-load', {category: 'server'});
+
+Now that you have the Tracking library in your code base, let's see how you can use it.
 
 ### Working with Collectors ###
 

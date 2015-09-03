@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "doc": "./node_modules/.bin/jsdoc -d build/dev/doc -r -P ./package.json src",
+    "prebuild": "npm install",
     "build:dev": "r.js.cmd -o optimize=none baseUrl=src name=../node_modules/almond/almond include=Tracking out=build/tracking.js wrap.startFile=wrap.start.txt wrap.endFile=wrap.end.txt",
     "build:prod": "r.js.cmd -o baseUrl=src name=../node_modules/almond/almond include=Tracking out=build/tracking.min.js wrap.startFile=wrap.start.txt wrap.endFile=wrap.end.txt",
     "build": "npm run-script build:dev && npm run-script build:prod"
