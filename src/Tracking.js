@@ -31,25 +31,25 @@ define([
         Tracking[name] = constructor(Tracking);
     }
 
-    /** @member {Collectors} collectors */
+    /** @member {Collectors} Tracking.collectors */
     mixin('collectors', Collectors);
 
-    /** @member {Errors} errors */
+    /** @member {Errors} Tracking.errors */
     mixin('errors', Errors);
 
-    /** @member {Events} events */
+    /** @member {Events} Tracking.events */
     mixin('events', Events);
 
-    /** @member {Timers} timers */
+    /** @member {Timers} Tracking.timers */
     mixin('timers', Timers);
 
-    /** @member {Marks} marks */
+    /** @member {Marks} Tracking.marks */
     mixin('marks', Marks);
 
-    /** @member {Static} static */
+    /** @member {Static} Tracking.static */
     mixin('static', Static);
 
-    /** @member {Network} network */
+    /** @member {Network} Tracking.network */
     mixin('network', Network);
 
     return Tracking;

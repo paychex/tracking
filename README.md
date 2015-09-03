@@ -12,14 +12,15 @@ We wrote the Tracking library to be a single API that covers all of your user be
 More specifically, there are 7 analytics the Tracking library provides:
 
  1. tracking user behavior (user events)
- 2. collecting context-specific metrics (data events)
- 3. segmenting analytics by context, metrics, and dimensions
- 4. timing user-initiated transactions, with optional nesting (timers)
- 5. timing specific points in the application lifecycle against a common baseline (marks)
- 6. measuring the time between any 2 marks, with optional nested marks (measures)
- 7. measuring download times for scripts, documents, css, and html (network timings)
+ 2. tracking errors (error events)
+ 3. collecting context-specific metrics (data events)
+ 4. segmenting analytics by context, metrics, and dimensions
+ 5. timing user-initiated transactions, with optional nesting (timers)
+ 6. timing specific points in the application lifecycle against a common baseline (marks)
+ 7. measuring the time between any 2 marks, with optional nested marks (measures)
+ 8. measuring download times for scripts, documents, css, and html (network timings)
 
-All 7 analytics follow a single consistent format, allowing you to specify optional categories, tags, variables, etc.
+All 8 analytics follow a single consistent format, allowing you to specify optional categories, tags, variables, etc.
 This metadata can be used in analysis packages to generate queries with incredible detail and focus.
 
 Finally, all of this data can be persisted to any number of collectors you specify. A *collector* is simply a JavaScript
@@ -36,12 +37,60 @@ session id to the custom data field so it shows in log entries.
 
 TODO
 
-Okay, now let's look at the fun stuff: how to use the Tracking API in each of the use cases listed above.
+### Working with Collectors ###
+
+Any object with a `collect` method can be registered as a tracking collector using the `collectors` API:
+
+    Tracking.collectors.add(collector:Object{collect:Function}) : Function
+    
+    var removeCollector = Tracking.collectors.add({
+        collect: function collect(info) {
+            console.log(info.toString());
+        }
+    });
+
+We provide a Google Analytics collector for you. This collector will convert `TrackingInfo` instances into the correct
+calls to the global `ga` method installed by the analytics.js script.
+
+    <script src="/path/to/analytics.js"></script>
+    <script>
+        Tracking.collectors.add(new GoogleAnalytics({network: false}));
+    </script>
+
+The GA collector we provide allows you to specify custom "off switches" to turn off the collection of specific tracking
+data types. In the example above, we disable tracking network timings (i.e., resource downloads such as scripts, CSS,
+and PDF files).
+
+You can create your own collectors easily. Just provide a method called `collect` that takes a TrackingInfo instance
+as its sole argument. See the code for our GoogleAnalytics collector for an example of how you might implement your own
+collector.
+
+### Decorating TrackingInfo Instances ###
+
+Before each TrackingInfo instance is sent to collectors, you have an opportunity to decorate it by appending custom
+tags and data. Whereas custom metrics and dimensions add metadata to *all* TrackingInfo instances, decorating can be
+conditional. For example:
+
+    // tag all network requests over 2 seconds as long-running:
+    var removeDecorator = Tracking.collectors.decorate(function myDecorator(info) {
+        if (info.type === 'network' && info.duration >= 2000) {
+            info.tags.push('long-running'); // so we can query "long-running" in our analysis package
+        }
+    });
+
+This flexibility enables you to easily construct helpful queries in your analysis tools by placing your conditional
+logic in the UI instead of the back-end.
+
+---
+
+Okay, now let's look at the fun stuff: how to use the Tracking API to track various analytics.
 
 ### Tracking User Behavior ###
+### Tracking Errors ###
 ### Collecting Context-Specific Metrics ###
 ### Segmenting Analytics by Context, Metrics, and Dimensions ###
 ### Timing User-Initiated Transactions, with Optional Nesting ###
 ### Timing Specific Points in the Application Lifecycle Against a Common Baseline ###
 ### Measuring the Time Between Any 2 Marks, with Optional Nested Marks ###
 ### Measuring Download Times for Scripts, Documents, CSS, and HTML ###
+
