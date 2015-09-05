@@ -1,4 +1,4 @@
-/* global define: false */
+/* global define, window: false */
 define([], function() {
 
     'use strict';
@@ -18,12 +18,13 @@ define([], function() {
         },
 
         setValue = function setValue(info) {
-            ga('set', info.label, info.variable);
+            ga('set', info.label, info.variable === undefined ? '' : info.variable);
         },
 
         setContext = function setContext(info) {
             switch (info.category) {
                 case 'page':
+                    setContext({category: 'app', label: ''});
                     var data = merge({
                         page: info.label
                     }, info.data);
@@ -31,14 +32,23 @@ define([], function() {
                     ga('set', data);
                     break;
                 case 'app':
-                    ga('set', merge({
-                        appName: info.label
-                    }, info.data));
+                    setContext({category: 'screen', label: ''});
+                    if (info.label === '') {
+                        ga('set', {appName: ''});
+                    } else {
+                        ga('set', merge({
+                            appName: info.label
+                        }, info.data));
+                    }
                     break;
                 case 'screen':
-                    ga('send', 'screenview', merge({
-                        screenName: info.label
-                    }, info.data));
+                    if (info.label === '') {
+                        ga('send', 'screenView', {screenName: ''});
+                    } else {
+                        ga('send', 'screenview', merge({
+                            screenName: info.label
+                        }, info.data));
+                    }
                     break;
             }
         },

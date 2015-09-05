@@ -111,8 +111,20 @@ Okay, now let's look at the fun stuff: how to use the Tracking API to track vari
 
 ### Tracking User Behavior ###
 ### Tracking Errors ###
-### Collecting Context-Specific Metrics ###
-### Segmenting Analytics by Context, Metrics, and Dimensions ###
+### Collecting Context-Specific Data ###
+
+    dimensions
+    └ context: page
+    │ └ page metrics
+    │ └ context: app
+    │   └ app metrics
+    │   └ context: screen
+    │     └ screen metrics
+    └ context: custom-1
+    │ └ custom-1 metrics
+    └ context: custom-2
+      └ custom-2 metrics
+
 ### Timing User-Initiated Transactions, with Optional Nesting ###
 ### Timing Specific Points in the Application Lifecycle Against a Common Baseline ###
 ### Measuring the Time Between Any 2 Marks, with Optional Nested Marks ###

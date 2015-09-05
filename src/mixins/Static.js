@@ -11,19 +11,21 @@ define(['../TrackingInfo'], function(TrackingInfo) {
      */
     return function Static(Tracking) {
 
-        var metrics = {},
+        var levels = ['page', 'app', 'screen'],
+
+            metrics = {},
             dimensions = {},
-            context = {
-                page:   'not set',
-                app:    'not set',
-                screen: 'not set'
-            },
+            context = {},
 
             clone = function clone(obj) {
                 return Object.keys(obj).reduce(function copy(result, key) {
                     return result[key] = obj[key], result;
                 }, {});
             };
+
+        levels.forEach(function addContext(level) {
+            context[level] = 'not set';
+        });
 
         Tracking.collectors.decorate(function setMetaData(info) {
             info.data.context = context;
@@ -34,33 +36,44 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         /**
          * Sets the global context on future {@link TrackingInfo}
          * instances before they are sent to any registered collectors.
-         * Typically, this would be the current "screen" of your
-         * application. Until provided, the default context is "none".
+         * There are 3 built-in context levels: page > app > screen.
+         * You can only be in one context at any given level, and
+         * setting an outer level will clear any inner levels. See the
+         * examples for details.
          * @function Static.setContext
-         * @param {String} name The name of the context to set.
          * @param {String} type The type of context to set.
-         *  Possible values include 'page', 'app', or 'screen'.
+         *  Possible values include 'page', 'app', or 'screen', or any
+         *  custom value you want, such as 'dialog'.
+         * @param {String} name The name of the context to set.
          * @param {Object} [data] Any optional data to include with
          *  the TrackingInfo.
          * @example
          * // set page first
-         * Tracking.static.setContext('/index', 'page', {
+         * Tracking.static.setContext('page', '/index', {
          *   title: 'Home'
          * });
          *
          * // then set app (if applicable)
-         * Tracking.static.setContext('myAppName', 'app', {
+         * Tracking.static.setContext('app', 'myAppName', {
          *   'appId': 'myAppId',
          *   'appVersion': '1.0'
          * });
          *
          * // then set the screen of the app (if applicable)
-         * Tracking.static.setContext('main', 'screen');
+         * Tracking.static.setContext('screen', 'main');
          *
          * // subsequent tracking entries will include this data
          * Tracking.events.fire('loading');
+         *
+         * // if we now re-set the app level, the screen will
+         * // be un-set for us automatically:
+         * Tracking.static.setContext('app', 'anotherApp');
+         * Tracking.events.fire('loading'); // page and app values will
+         *      // be sent with this and future events, but not the
+         *      // previous screen value
          */
-        Static.setContext = function setContext(name, type, data) {
+        Static.setContext = function setContext(type, name, data) {
+            Static.unsetContext(type);
             context[type] = name;
             Tracking.collectors.collect(new TrackingInfo({
                 type: 'context',
@@ -71,23 +84,76 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         };
 
         /**
+         * Clears any custom metrics associated with the specified
+         * context type (page, app, screen, or a custom value), then
+         * removes that context from the cached list. The context
+         * and associated metrics will no longer be added to future
+         * TrackingInfo instances.
+         * @function Static.unsetContext
+         * @param {String} type The type of context whose metrics
+         *  should be cleared and which should be removed from the
+         *  internal cache and no longer sent with future tracking
+         *  data.
+         * @example
+         * // automatically unsetting a context:
+         * Tracking.static.setContext('screen', 'welcome');
+         * // setting a new context at the same level will
+         * // clear that context and any "lower" contexts,
+         * // exclusing any custom contexts, which must be
+         * // unset manually
+         * Tracking.static.setContext('screen', 'dashboard');
+         * @example
+         * // manually unsetting a custom context:
+         * Tracking.static.setContext('dialog', 'help');
+         * Tracking.static.unsetContext('dialog');
+         */
+        Static.unsetContext = function unsetContext(type) {
+            var allLevels = levels.concat(type),
+                index = allLevels.indexOf(type);
+            allLevels.slice(index).forEach(function clearContext(level) {
+                delete context[level];
+                var metrics = metrics[level];
+                for(var metric in metrics) {
+                    if (metrics.hasOwnProperty(metric)) {
+                        Static.setMetric(level, metric);
+                    }
+                }
+            });
+        };
+
+        /**
          * Adds a new custom metric to the internal collection.
          * Custom metrics will be added to future {@link TrackingInfo}
          * instances automatically before persisting to collectors.
          * @function Static.setMetric
+         * @param {String} type The type of metric to set.
+         *  Possible values include 'page', 'app', or 'screen'.
          * @param {String} name The name of the custom metric to set.
          * @param {*} value The value to associate with the custom
          *  metric. If `undefined`, the metric will no longer appear
          *  in future TrackingInfo instances.
          * @example
-         * Tracking.static.setMetric('mode', 'admin');
+         * Tracking.static.setMetric('page', 'loginTime', Date.now());
+         * Tracking.static.setMetric('app', 'mode', 'admin');
+         * Tracking.static.setMetric('screen', 'message count', 6);
          * Tracking.events.fire('applications loaded');
+         * @example
+         * // to unset a previously set metric, either pass an empty
+         * // string or do not specify the value:
+         * Tracking.metric.setMetric('app', 'mode');
+         * Tracking.metric.setMetric('app', 'mode', '');
          */
-        Static.setMetric = function setMetric(name, value) {
-            metrics[name] = value;
+        Static.setMetric = function setMetric(type, name, value) {
+            metrics[type] = metrics[type] || {};
+            if (typeof value === 'undefined') {
+                delete metrics[type][name];
+            } else {
+                metrics[type][name] = value;
+            }
             Tracking.collectors.collect(new TrackingInfo({
                 label: name,
                 type: 'metric',
+                category: type,
                 variable: value
             }));
         };
