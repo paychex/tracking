@@ -11,9 +11,13 @@ define(['../TrackingInfo'], function(TrackingInfo) {
      */
     return function Static(Tracking) {
 
-        var context,
-            metrics = {},
+        var metrics = {},
             dimensions = {},
+            context = {
+                page:   'not set',
+                app:    'not set',
+                screen: 'not set'
+            },
 
             clone = function clone(obj) {
                 return Object.keys(obj).reduce(function copy(result, key) {
@@ -22,7 +26,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             };
 
         Tracking.collectors.decorate(function setMetaData(info) {
-            info.data.context = context || 'none';
+            info.data.context = context;
             info.data.metrics = clone(metrics);
             info.data.dimensions = clone(dimensions);
         });
@@ -34,15 +38,35 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * application. Until provided, the default context is "none".
          * @function Static.setContext
          * @param {String} name The name of the context to set.
+         * @param {String} type The type of context to set.
+         *  Possible values include 'page', 'app', or 'screen'.
+         * @param {Object} [data] Any optional data to include with
+         *  the TrackingInfo.
          * @example
-         * Tracking.static.setContext('main');
+         * // set page first
+         * Tracking.static.setContext('/index', 'page', {
+         *   title: 'Home'
+         * });
+         *
+         * // then set app (if applicable)
+         * Tracking.static.setContext('myAppName', 'app', {
+         *   'appId': 'myAppId',
+         *   'appVersion': '1.0'
+         * });
+         *
+         * // then set the screen of the app (if applicable)
+         * Tracking.static.setContext('main', 'screen');
+         *
+         * // subsequent tracking entries will include this data
          * Tracking.events.fire('loading');
          */
-        Static.setContext = function setContext(name) {
-            context = name;
+        Static.setContext = function setContext(name, type, data) {
+            context[type] = name;
             Tracking.collectors.collect(new TrackingInfo({
                 type: 'context',
-                label: name
+                label: name,
+                data: data || {},
+                category: type
             }));
         };
 

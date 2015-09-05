@@ -24,7 +24,8 @@ define(['Tracking'], function(Tracking) {
     Tracking.events.fire('click', {label: 'button clicked', misc: 'hello'});
     Tracking.events.fire('load', {category: 'DOM', label: 'site loaded'});
 
-    Tracking.static.setContext('main');
+    Tracking.static.setContext('main', 'page');
+    Tracking.static.setContext('demo', 'app', {appVersion: '1.0.0'});
     Tracking.static.setMetric('uid', 'username');
 
     Tracking.events.fire('count', {
@@ -46,7 +47,7 @@ define(['Tracking'], function(Tracking) {
         
             parent.start();
 
-            Tracking.static.setContext('loop #' + count);
+            Tracking.static.setContext('loop #' + count, 'screen');
             Tracking.marks.set('timers.started', {category: 'timers'});
             
             if (count === 1) {

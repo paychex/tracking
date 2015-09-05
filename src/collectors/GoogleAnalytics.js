@@ -22,9 +22,25 @@ define([], function() {
         },
 
         setContext = function setContext(info) {
-            ga('send', 'pageview', merge({
-                'title': info.label
-            }, info.data));
+            switch (info.category) {
+                case 'page':
+                    var data = merge({
+                        page: info.label
+                    }, info.data);
+                    ga('send', 'pageview', data);
+                    ga('set', data);
+                    break;
+                case 'app':
+                    ga('set', merge({
+                        appName: info.label
+                    }, info.data));
+                    break;
+                case 'screen':
+                    ga('send', 'screenview', merge({
+                        screenName: info.label
+                    }, info.data));
+                    break;
+            }
         },
 
         sendEvent = function sendEvent(info) {
