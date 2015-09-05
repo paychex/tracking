@@ -24,6 +24,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             };
 
         levels.forEach(function addContext(level) {
+            metrics[level] = {};
             context[level] = 'not set';
         });
 
@@ -111,10 +112,10 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             var allLevels = levels.concat(type),
                 index = allLevels.indexOf(type);
             allLevels.slice(index).forEach(function clearContext(level) {
-                delete context[level];
-                var metrics = metrics[level];
-                for(var metric in metrics) {
-                    if (metrics.hasOwnProperty(metric)) {
+                context[level] = 'not set';
+                var mets = clone(metrics[level]);
+                for(var metric in mets) {
+                    if (mets.hasOwnProperty(metric)) {
                         Static.setMetric(level, metric);
                     }
                 }
@@ -145,7 +146,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          */
         Static.setMetric = function setMetric(type, name, value) {
             metrics[type] = metrics[type] || {};
-            if (typeof value === 'undefined') {
+            if (typeof value === 'undefined' || value === '') {
                 delete metrics[type][name];
             } else {
                 metrics[type][name] = value;
