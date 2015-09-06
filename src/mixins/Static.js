@@ -18,15 +18,11 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             context = {},
 
             clone = function clone(obj) {
+                obj = obj || {};
                 return Object.keys(obj).reduce(function copy(result, key) {
                     return result[key] = obj[key], result;
                 }, {});
             };
-
-        levels.forEach(function addContext(level) {
-            metrics[level] = {};
-            context[level] = 'not set';
-        });
 
         Tracking.collectors.decorate(function setMetaData(info) {
             info.data.context = context;
@@ -113,6 +109,9 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                 index = allLevels.indexOf(type);
             allLevels.slice(index).forEach(function clearContext(level) {
                 context[level] = 'not set';
+                if (levels.indexOf(type) === -1) {
+                    delete context[level];
+                }
                 var mets = clone(metrics[level]);
                 for(var metric in mets) {
                     if (mets.hasOwnProperty(metric)) {
@@ -146,10 +145,14 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          */
         Static.setMetric = function setMetric(type, name, value) {
             metrics[type] = metrics[type] || {};
+            metrics[type][name] = value;
             if (typeof value === 'undefined' || value === '') {
+                value = '';
                 delete metrics[type][name];
-            } else {
-                metrics[type][name] = value;
+            }
+            if (levels.indexOf(type) === -1 &&
+                !Object.keys(metrics[type]).length) {
+                delete metrics[type];
             }
             Tracking.collectors.collect(new TrackingInfo({
                 label: name,
@@ -167,7 +170,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * @function Static.setDimension
          * @param {String} name The name of the custom dimension.
          * @param {String|undefined} value The value to associate
-         *  with the new custom dimension. If `undefined`, the
+         *  with the new custom dimension. If `undefined` or '', the
          *  dimension will no longer appear in future TrackingInfo
          *  instances.
          * @example
@@ -177,14 +180,33 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          */
         Static.setDimension = function setDimension(name, value) {
             dimensions[name] = value;
+            if (value === undefined || value === '') {
+                delete dimensions[name];
+            }
             Tracking.collectors.collect(new TrackingInfo({
                 label: name,
                 type: 'dimension',
                 /* jshint -W041 */
-                variable: value == null ? value : value.toString()
+                variable: value === undefined || value === null ?
+                    '' : value.toString()
             }));
         };
         
+        /**
+         * @private
+         */
+        Static.reset = function reset() {
+            metrics = {};
+            dimensions = {};
+            context = {};
+            levels.forEach(function addContext(level) {
+                metrics[level] = {};
+                context[level] = 'not set';
+            });
+        };
+
+        Static.reset();
+
         return Static;
         
     };

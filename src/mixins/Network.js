@@ -1,4 +1,4 @@
-/* global define, performance, setInterval: false */
+/* global define, window, setInterval: false */
 define(['../TrackingInfo'], function(TrackingInfo) {
     
     'use strict';
@@ -23,6 +23,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
 
         var lastLength = 0,
             resourceCounts = {},
+            perf = window.performance,
             persist = Tracking.collectors.collect.bind(Tracking.collectors),
             
             getTimingInfo = function getTimingInfo(timing) {
@@ -36,6 +37,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                     data: {
                         size: timing.transferSize, // NOTE: not all browsers provide transferSize
                         cachedOrLocal: timing.fetchStart === timing.connectEnd,
+                        blockTime: Math.max(0, (timing.requestStart || timing.fetchStart) - timing.startTime),
                         stages: {
                             fetch: {
                                 start: timing.fetchStart,
@@ -78,21 +80,23 @@ define(['../TrackingInfo'], function(TrackingInfo) {
 
             };
         
-        if (!!performance && !!performance.getEntriesByType) {
-            
-            Network.getEntries = performance.getEntriesByType.bind(performance, 'resource');
+        if (!!perf && !!perf.getEntriesByType) {
 
-            performance.addEventListener('onresourcetimingbufferfull', function bufferFull() {
-                collectTimings();
-                lastLength = 0;
-            });
-            
+            Network.getEntries = perf.getEntriesByType.bind(perf, 'resource');
+
+            /* jshint -W030 */
+            perf.addEventListener && perf.addEventListener('onresourcetimingbufferfull',
+                function bufferFull() {
+                    collectTimings();
+                    lastLength = 0;
+                });
+
             setInterval(collectTimings, 1000);
 
         }
-        
+
         return Network;
-        
+
     };
     
 });

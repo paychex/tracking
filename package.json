@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "doc": "./node_modules/.bin/jsdoc -d build/dev/doc -r -P ./package.json src",
+    "pretest": "npm install",
+    "test": "karma start karma.conf.js",
+    "test-single-run": "karma start karma.conf.js --single-run",
     "prebuild": "npm install",
     "build:dev": "r.js.cmd -o optimize=none baseUrl=src name=../node_modules/almond/almond include=Tracking out=build/tracking.js wrap.startFile=wrap.start.txt wrap.endFile=wrap.end.txt",
     "build:prod": "r.js.cmd -o baseUrl=src name=../node_modules/almond/almond include=Tracking out=build/tracking.min.js wrap.startFile=wrap.start.txt wrap.endFile=wrap.end.txt",
@@ -25,8 +28,18 @@
   },
   "homepage": "https://github.com/daninnewyork/Tracking",
   "dependencies": {
+    "requirejs": "^2.1.19"
+  },
+  "devDependencies": {
     "almond": "^0.3.1",
     "jsdoc": "^3.3.0-alpha10",
-    "requirejs": "^2.1.19"
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.9",
+    "karma-cli": "^0.1.0",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-requirejs": "^0.2.2",
+    "karma-story-reporter": "^0.3.1",
+    "phantomjs": "^1.9.18"
   }
 }
