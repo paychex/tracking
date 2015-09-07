@@ -77,7 +77,7 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
             this.remove();
             this.collector.verifyNoOutstandingExpectations();
             Tracking.static.reset();
-            Tracking.collectors.disable();
+            Tracking.collectors.reset();
         });
 
         describe('setDimension', function() {

@@ -234,6 +234,13 @@ define([
             return new Timer(name);
         };
         
+        /**
+         * @private
+         */
+        Timers.reset = function reset() {
+            counts = {};
+        };
+
         return Timers;
 
     };

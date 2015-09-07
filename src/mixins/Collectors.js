@@ -150,6 +150,19 @@ define([], function() {
             }
         };
         
+        /**
+         * @private
+         */
+        Collectors.reset = function reset() {
+            queue = [];
+            collectors = [];
+            isPaused = true;
+            // NOTE:
+            // we can't reset decorators because
+            // the Network mixin depends on having
+            // its decorator applied
+        };
+
         return Collectors;
         
     };

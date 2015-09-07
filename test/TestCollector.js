@@ -1,6 +1,9 @@
+/* global define: true */
 define([], function() {
 
     'use strict';
+
+    /* jshint jasmine: true */
 
     function TestCollector() {
         this.expected = [];

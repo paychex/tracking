@@ -7,36 +7,36 @@ define([
     Stopwatch,
     TrackingInfo
 ) {
-    
+
     'use strict';
-    
+
     var marks = [],
         measures = [],
-        
+
         hasLabel = function hasLabel(label) {
             return function isMatch(prev, mark) {
                 return mark.label === label ? mark : prev;
             };
         },
-        
+
         getCounter = function getCounter(label) {
             return function counter(count, mark) {
                 return count + ((mark.label === label) ? 1: 0);
             };
         },
-        
+
         navStart = (function() {
 
             function exists(prev, key) {
                 return !!prev && !!prev[key] ? prev[key] : null;
             }
-            
+
             return ['performance', 'timing', 'navigationStart']
                 .reduce(exists, window) || Stopwatch.now();
-            
+
         })(),
 
-        polyMark = function mark(name, data) {
+        polyMark = function mark(name, data, ignoreBuiltIn) {
 
             var instance = {
                 data: data,
@@ -46,13 +46,13 @@ define([
                 stop: Stopwatch.now(),
                 count: marks.reduce(getCounter(name), 1)
             };
-            
-            marks.push(instance);
-            
-            if (!!window.performance) {
+
+            if (!ignoreBuiltIn && !!window.performance) {
                 window.performance.mark(name);
             }
-            
+
+            marks.push(instance);
+
             return instance;
 
         },
@@ -62,9 +62,17 @@ define([
             var instance,
                 mark1 = marks.reverse().reduce(hasLabel(start), null),
                 mark2 = marks.reverse().reduce(hasLabel(stop), null);
-            
+
+            if (typeof start !== 'string' || !start.length) {
+                mark1 = marks.reduce(hasLabel('navigationStart'), null);
+            }
+
+            if (typeof stop !== 'string' || !stop.length) {
+                mark2 = polyMark('anonymous', {}, true);
+            }
+
             if (!!mark1 && !!mark2) {
-            
+
                 instance = {
                     data: data,
                     label: name,
@@ -81,18 +89,44 @@ define([
                     });
                 }
 
-                measures.push(instance);
-                
                 if (!!window.performance) {
                     window.performance.measure(name, start, stop);
                 }
-                
+
+                measures.push(instance);
+
                 return instance;
 
             }
 
+        },
+
+        clearEntries = function clearEntries(rx, arr, fnName) {
+
+            if (typeof rx === 'string') {
+                rx = new RegExp(rx, 'i');
+            } else if (rx === undefined) {
+                rx = /./;
+            } else if (!(rx instanceof RegExp)) {
+                throw new Error('Regular expression or string expected.');
+            }
+
+            var test = function test(value) {
+                    return rx.test(value.label);
+                },
+
+                fn = !!window.performance && !!window.performance[fnName] ?
+                    window.performance[fnName] : function nop() {};
+
+            arr.filter(test).forEach(function remove(item) {
+                if (arr !== marks || item.label !== 'navigationStart') {
+                    fn(item.label);
+                    arr.splice(arr.indexOf(item), 1);
+                }
+            });
+
         };
-    
+
     /**
      * Provides the ability to mark specific moments in an application's
      * behavior, and to measure the time between any of those marks.
@@ -121,11 +155,11 @@ define([
             if (typeof name !== 'string' || !name.length) {
                 throw new Error('A mark name must be specified.');
             }
-            
+
             Tracking.collectors.collect(new TrackingInfo(polyMark(name, data)));
 
         };
-        
+
         /**
          * Creates a new mark whose name is prepended with "Start: ".
          * This method is meant to be called in conjunction with
@@ -196,12 +230,10 @@ define([
          */
         Marks.measure = function measure(name, start, stop, data, between) {
 
-            [name, start, stop].forEach(function validateArgument(value) {
-                if (typeof value !== 'string' || !value.length) {
-                    throw new Error('Parameters `name`, `start`, and `stop` are required.');
-                }
-            });
-            
+            if (typeof name !== 'string' || !name.length) {
+                throw new Error('Parameter `name` is required.');
+            }
+
             var instance = polyMeasure(name, start, stop, data, between);
             if (!!instance) {
                 Tracking.collectors.collect(new TrackingInfo(instance));
@@ -216,7 +248,7 @@ define([
         Marks.getMarks = function getMarks() {
             return marks.concat();
         };
-        
+
         /**
          * @function Marks.getMeasures
          * @returns {Array} An array of measure instances.
@@ -224,9 +256,56 @@ define([
         Marks.getMeasures = function getMeasures() {
             return measures.concat();
         };
-        
+
+        /**
+         * Removes all marks matching the specified regular expression.
+         * If no expression is provided, all marks will be removed.
+         * @function Marks.clearMarks
+         * @param {RegExp|String} [rx] Optional RegExp instance or
+         *  regular expression pattern to use to narrow the list of
+         *  marks to remove.
+         * @example
+         * Tracking.marks.clearMarks(/load/);
+         * Tracking.marks.clearMarks('my-feature-name');
+         */
+        Marks.clearMarks = function clearMarks(rx) {
+            clearEntries(rx, marks, 'clearMarks');
+        };
+
+        /**
+         * Removes all measures matching the specified regular expression.
+         * If no expression is provided, all measures will be removed.
+         * @function Marks.clearMeasures
+         * @param {RegExp|String} [rx] Optional RegExp instance or
+         *  regular expression pattern to use to narrow the list of
+         *  measures to remove.
+         * @example
+         * Tracking.marks.clearMeasures(/load/);
+         * Tracking.marks.clearMeasures('my-feature-name');
+         */
+        Marks.clearMeasures = function clearMarks(rx) {
+            clearEntries(rx, measures, 'clearMeasures');
+        };
+
+        /**
+         * @private
+         */
+        Marks.reset = function reset() {
+            measures = [];
+            marks = [{
+                data: {},
+                count: 1,
+                type: 'mark',
+                stop: navStart,
+                start: navStart,
+                label: 'navigationStart'
+            }];
+        };
+
+        Marks.reset();
+
         return Marks;
-        
+
     };
-    
+
 });

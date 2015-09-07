@@ -25,7 +25,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             };
 
         Tracking.collectors.decorate(function setMetaData(info) {
-            info.data.context = context;
+            info.data.context = clone(context);
             info.data.metrics = clone(metrics);
             info.data.dimensions = clone(dimensions);
         });

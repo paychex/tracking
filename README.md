@@ -132,5 +132,18 @@ be included with subsequent TrackingInfo instances.
 ### Timing User-Initiated Transactions, with Optional Nesting ###
 ### Timing Specific Points in the Application Lifecycle Against a Common Baseline ###
 ### Measuring the Time Between Any 2 Marks, with Optional Nested Marks ###
+
+**NOTE:** Although the [W3C specification](http://www.w3.org/TR/user-timing/) allows
+developers to use a number of built-in mark names in their measure calls, the Tracking
+library only allows developers to use `navigationStart`.
+
+    Tracking.marks.measure('my measure name', 'navigationStart', 'some other mark');
+
+Incidentally, `navigationStart` is also the default start value if you do not specifiy a
+starting mark name. The default value if you do not specify a stop mark name is the current
+epoch time:
+
+    Tracking.marks.measure('nav start until now' /* no start or stop needed */);
+
 ### Measuring Download Times for Scripts, Documents, CSS, and HTML ###
 
