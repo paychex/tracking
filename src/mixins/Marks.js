@@ -209,8 +209,11 @@ define([
          * Measures the time between 2 marks.
          * @function Marks.measure
          * @param {String} name The name of the measure to create.
-         * @param {String} start The name of the first mark.
-         * @param {String} stop The name of the second mark.
+         * @param {String} [start] The name of the first mark. If not
+         *  specified, "navigationStart" will be used.
+         * @param {String} [stop] The name of the second mark. If not
+         *  specified, an "anonymous" mark will be created at the current
+         *  point in time and used instead.
          * @param {Object} [data] Optional object whose members will be
          *  used to set properties on the {@link TrackingInfo} instance
          *  sent to any registered collectors.

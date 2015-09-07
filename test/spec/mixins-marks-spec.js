@@ -366,6 +366,21 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                     expect(Tracking.marks.getMeasures().length).toBe(0);
                 });
 
+                it('removes all entries but navigationStart if called with no parameters', function() {
+                    this.expectInfo({});
+                    this.expectInfo({});
+                    Tracking.marks.set('mark');
+                    Tracking.marks.measure('mark');
+                    expect(Tracking.marks.getMarks().length).toBe(3);
+                    expect(Tracking.marks.getMeasures().length).toBe(1);
+                    expect(Tracking.marks.getMarks()[0].label).toBe('navigationStart');
+                    Tracking.marks.clearMarks();
+                    Tracking.marks.clearMeasures();
+                    expect(Tracking.marks.getMarks().length).toBe(1);
+                    expect(Tracking.marks.getMeasures().length).toBe(0);
+                    expect(Tracking.marks.getMarks()[0].label).toBe('navigationStart');
+                });
+
                 it('does nothing if no entries match', function() {
                     this.expectInfo({});
                     this.expectInfo({});

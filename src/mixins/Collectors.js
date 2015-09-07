@@ -73,12 +73,13 @@ define([], function() {
         };
 
         /**
-         * Registers a decorator function. Decorators run after
-         * a {@link TrackingInfo} instance is created but before
-         * it is sent to any registered collectors. Note that
-         * top-level TrackingInfo instance properties are frozen,
-         * but you can still modify the `tags` and `data` fields.
-         * See the example for details.
+         * Registers a decorator function. Decorators run when
+         * a {@link TrackingInfo} instance is created, which
+         * (if collection is disabled) could be long before the
+         * instance is sent to collectors. Note that top-level
+         * TrackingInfo instance properties are frozen, but you
+         * can still modify the `tags` and `data` fields. See
+         * the example for details.
          * @function Collectors.decorate
          * @param {Function} decorator The method to call with
          *  each newly created {@link TrackingInfo} instance.

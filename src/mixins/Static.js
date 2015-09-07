@@ -96,7 +96,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.setContext('screen', 'welcome');
          * // setting a new context at the same level will
          * // clear that context and any "lower" contexts,
-         * // exclusing any custom contexts, which must be
+         * // excluding any custom contexts, which must be
          * // unset manually
          * Tracking.static.setContext('screen', 'dashboard');
          * @example
@@ -127,11 +127,12 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * instances automatically before persisting to collectors.
          * @function Static.setMetric
          * @param {String} type The type of metric to set.
-         *  Possible values include 'page', 'app', or 'screen'.
+         *  Possible values include 'page', 'app', or 'screen', as
+         *  well as any custom contexts you may have set.
          * @param {String} name The name of the custom metric to set.
          * @param {*} value The value to associate with the custom
-         *  metric. If `undefined`, the metric will no longer appear
-         *  in future TrackingInfo instances.
+         *  metric. If `undefined` or '', the metric will no longer
+         *  appear in future TrackingInfo instances.
          * @example
          * Tracking.static.setMetric('page', 'loginTime', Date.now());
          * Tracking.static.setMetric('app', 'mode', 'admin');
