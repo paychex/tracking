@@ -4,6 +4,15 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
 
     'use strict';
 
+    // Phantom has odd notions about Dates, and Jasmine's
+    // mock clock doesn't help because Stopwatch has already
+    // wrapped Date.now for its use; so, we create a fuzzy
+    // predicate here for use in some below tests:
+    var withinDelta = function(actual, expected, delta) {
+        return actual >= expected - delta &&
+            actual <= expected + delta;
+    };
+
     /* jshint jasmine: true */
 
     describe('mixins/Timers', function() {
@@ -85,7 +94,7 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                 it('sets startTime to current epoch time', function() {
                     var timer = Tracking.timers.create('timer');
                     timer.start();
-                    expect(timer.startTime).toBeCloseTo(Date.now(), 2);
+                    expect(withinDelta(timer.startTime, Date.now(), 5)).toBe(true);
                 });
 
                 it('sets state to STARTED', function() {
@@ -136,7 +145,7 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                     var timer = Tracking.timers.create('timer');
                     timer.start();
                     timer.stop();
-                    expect(timer.stopTime).toBeCloseTo(Date.now(), 2);
+                    expect(withinDelta(timer.stopTime, Date.now(), 5)).toBe(true);
                 });
 
                 it('sets state to STOPPED', function() {

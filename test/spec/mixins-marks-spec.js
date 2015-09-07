@@ -371,7 +371,7 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                     this.expectInfo({});
                     Tracking.marks.set('mark');
                     Tracking.marks.measure('mark');
-                    expect(Tracking.marks.getMarks().length).toBe(3);
+                    expect(Tracking.marks.getMarks().length).toBe(2);
                     expect(Tracking.marks.getMeasures().length).toBe(1);
                     expect(Tracking.marks.getMarks()[0].label).toBe('navigationStart');
                     Tracking.marks.clearMarks();

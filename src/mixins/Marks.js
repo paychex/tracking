@@ -68,7 +68,7 @@ define([
             }
 
             if (typeof stop !== 'string' || !stop.length) {
-                mark2 = polyMark('anonymous', {}, true);
+                mark2 = { stop: Stopwatch.now() };
             }
 
             if (!!mark1 && !!mark2) {
@@ -212,8 +212,7 @@ define([
          * @param {String} [start] The name of the first mark. If not
          *  specified, "navigationStart" will be used.
          * @param {String} [stop] The name of the second mark. If not
-         *  specified, an "anonymous" mark will be created at the current
-         *  point in time and used instead.
+         *  specified, the current epoch time will be used.
          * @param {Object} [data] Optional object whose members will be
          *  used to set properties on the {@link TrackingInfo} instance
          *  sent to any registered collectors.
@@ -230,6 +229,15 @@ define([
          *     category: 'loading', tags: ['network']
          *   })
          * });
+         * @example
+         * // navigationStart used as start mark if none specified:
+         * Tracking.marks.measure('between navigation and stop mark', null, 'stop mark');
+         * @example
+         * // the current time will be used if no stop mark is specified:
+         * Tracking.marks.measure('between start mark and now', 'start mark');
+         * @example
+         * // leave out start and stop marks to get navigation start to now:
+         * Tracking.marks.measure('between navigationStart and now');
          */
         Marks.measure = function measure(name, start, stop, data, between) {
 
