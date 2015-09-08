@@ -46,20 +46,23 @@ To include the Tracking library in your own applications, simply reference the b
         paths: {
             Tracking: 'path/to/tracking'
         }
-    });```
+    });
+```
 
 Then you can inject the Tracking library using code like the following:
 
 ```javascript
     define(['Tracking'], function(Tracking) {
         Tracking.marks.set('script loaded', {label: 'my script name'});
-    });```
+    });
+```
 
 Or, for node:
 
 ```javascript
     var Tracking = require('path/to/tracking');
-    Tracking.events.fire('script-load', {category: 'server'});```
+    Tracking.events.fire('script-load', {category: 'server'});
+```
 
 To run unit tests:
 
@@ -83,7 +86,8 @@ Any object with a `collect` method can be registered as a tracking collector usi
         collect: function collect(info) {
             console.log(info.toString());
         }
-    });```
+    });
+```
 
 We provide a Google Analytics collector for you. This collector will convert `TrackingInfo` instances into the correct
 calls to the global `ga` method installed by the analytics.js script.
@@ -92,7 +96,8 @@ calls to the global `ga` method installed by the analytics.js script.
     <script src="/path/to/analytics.js"></script>
     <script>
         Tracking.collectors.add(new GoogleAnalytics({network: false}));
-    </script>```
+    </script>
+```
 
 The GA collector we provide allows you to specify custom "off switches" to turn off the collection of specific tracking
 data types. In the example above, we disable tracking network timings (i.e., resource downloads such as scripts, CSS,
@@ -114,7 +119,8 @@ conditional. For example:
         if (info.type === 'network' && info.duration >= 2000) {
             info.tags.push('long-running'); // so we can query "long-running" in our analysis package
         }
-    });```
+    });
+```
 
 This flexibility enables you to easily construct helpful queries in your analysis tools by placing your conditional
 logic in the UI instead of the back-end.
@@ -129,7 +135,8 @@ User behavior is best tracked using *events*. Events help determine how users in
 core, an event is just an action plus any optional data you wish to associate with that event:
 
 ```javascript
-    Tracking.events.fire('action', {custom: 'data'});```
+    Tracking.events.fire('action', {custom: 'data'});
+```
 
 Common custom data you might wish to associate with an event include *category* and *label*:
 
@@ -137,7 +144,8 @@ Common custom data you might wish to associate with an event include *category* 
     Tracking.events.fire('click', {
         category: 'navigation',
         label: 'open sidebar'
-    });```
+    });
+```
 
 In addition to cateogry and label, you may find it useful to *tag* your events with additional information. One useful
 event tag is the type of UI element that generated the event (e.g. "button", "menu", "checkbox"):
@@ -147,7 +155,8 @@ event tag is the type of UI element that generated the event (e.g. "button", "me
         category: 'navigation',
         label: 'open sidebar',
         tags: ['button']
-    });```
+    });
+```
 
 But you aren't limited to the built-in DOM events. For example, if the user is closing a dialog, you may want to call
 that out as a unique event type:
@@ -163,7 +172,8 @@ that out as a unique event type:
                 tags: ['keypress']
             });
         }
-    });```
+    });
+```
 
 ### Tracking Errors ###
 
@@ -178,7 +188,8 @@ Accordingly, sending errors is incredibly easy:
         someMethodCall();
     } catch (e) {
         Tracking.errors.log(e);
-    }```
+    }
+```
 
 To log all *unhandled* errors, use this code:
 
@@ -188,7 +199,8 @@ To log all *unhandled* errors, use this code:
             url: url
         });
         return true; // prevent default handling
-    };```
+    };
+```
 
 ### Collecting Context-Specific Data ###
 
@@ -215,7 +227,8 @@ application that groups related functionalities together. In a basic TODO applic
     myRouter.on('navigate', function(e) {
         // e.page might be 'index' or 'edit':
         Tracking.static.setContext('screen', e.page);
-    });```
+    });
+```
 
 Because the built-in contexts are hierarchical, changing the "page" context will clear the "app" and "screen" contexts
 automatically. Changing the "app" context will **not** clear the "page" context but **will** clear the "screen" context.
@@ -229,14 +242,16 @@ top-sheets, wizards, and more.
 ```javascript
     Tracking.static.setContext('dialog', 'help');
     Tracking.static.setContext('panel', 'messages');
-    Tracking.static.setContext('tour-wizard-step', 'intro');```
+    Tracking.static.setContext('tour-wizard-step', 'intro');
+```
 
 Unlike the hierarchical built-in contexts, custom contexts must be un-set manually:
 
 ```javascript
     Tracking.static.unsetContext('dialog');
     Tracking.static.unsetContext('panel');
-    Tracking.static.unsetContext('tour-wizard-step');```
+    Tracking.static.unsetContext('tour-wizard-step');
+```
 
 #### Metrics and Dimensions ####
 
@@ -248,14 +263,16 @@ You can think of a metric as a data value that can be aggregated by context. For
 ```javascript
     Tracking.static.setMetric('page', 'visitCount', 5);
     Tracking.static.setMetric('app', 'errorCount', 0);
-    Tracking.static.setMetric('screen', 'message count', 34);```
+    Tracking.static.setMetric('screen', 'message count', 34);
+```
     
 Non-numeric values work just as well:
 
 ```javascript
     Tracking.static.setMetric('page', 'deviceType', 'phone');
     Tracking.static.setMetric('app', 'testGroup', 'minimal-ui');
-    Tracking.static.setMetric('screen', '', Date.now());```
+    Tracking.static.setMetric('screen', '', Date.now());
+```
 
 Basically, anything that can be grouped or bucketed is useful as a metric.
 
@@ -265,7 +282,8 @@ practice is to segment based on marketing data:
 ```javascript
      Tracking.static.setDimension('region', 'northeast');
      Tracking.static.setDimension('support-level', 'gold');
-     Tracking.static.setDimension('client-size', 'medium');```
+     Tracking.static.setDimension('client-size', 'medium');
+ ```
 
 Unlike metrics, dimensions should be string values.
 
@@ -322,7 +340,8 @@ When you have asynchronous, potentially nested transactions, consider using time
             .finally(function saveComplete() {
                 saveTimer.stop({category: 'save', tags: ['record']});
             });
-    }```
+    }
+```
 
 Because transactions are sometimes nested, you can also nest timers:
 
@@ -342,7 +361,8 @@ Because transactions are sometimes nested, you can also nest timers:
             }).finally(function allDone() {
                 searchTimer.stop();
             });
-    }```
+    }
+```
 
 With timers, a single tracking entry will be persisted when the top-most timer stops. Its `children`
 array member will include any nested timers you created.
@@ -368,7 +388,8 @@ This can be useful if you expect to be setting the same marks multiple times:
             // name will automatically create a measure
             // with that name (see next section below)
             Tracking.marks.stop('open search');
-        }).done();```
+        }).done();
+```
 
 ### Measuring the Time Between Any 2 Marks, with Optional Nested Marks ###
 
@@ -384,7 +405,8 @@ Once you've set any 2 marks, you can measure the time between them by calling `T
         'login to notifications shown',
         'login complete',
         'panel loaded'
-    );```
+    );
+```
 
 **NOTE 1:** If the same mark has been set multiple times, calling measure will take the *most recent*
 mark.
@@ -394,14 +416,16 @@ developers to use a number of built-in mark names in their measure calls, the Tr
 library only allows developers to use `navigationStart`.
 
 ```javascript
-    Tracking.marks.measure('my measure name', 'navigationStart', 'some other mark');```
+    Tracking.marks.measure('my measure name', 'navigationStart', 'some other mark');
+```
 
 Incidentally, `navigationStart` is also the default start value if you do not specifiy a
 starting mark name. The default value if you do not specify a stop mark name is the current
 epoch time:
 
 ```javascript
-    Tracking.marks.measure('nav start until now' /* no start or stop needed */);```
+    Tracking.marks.measure('nav start until now' /* no start or stop needed */);
+```
 
 ### Measuring Download Times for Scripts, Documents, CSS, and HTML ###
 
@@ -452,4 +476,5 @@ Typical resource entry:
                 }
             }
         }
-    }```
+    }
+```
