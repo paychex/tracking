@@ -283,7 +283,7 @@ practice is to segment based on marketing data:
      Tracking.static.setDimension('region', 'northeast');
      Tracking.static.setDimension('support-level', 'gold');
      Tracking.static.setDimension('client-size', 'medium');
- ```
+```
 
 Unlike metrics, dimensions should be string values.
 
