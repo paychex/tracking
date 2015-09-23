@@ -130,7 +130,7 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                 spyOn(Tracking.marks, 'measure');
                 Tracking.marks.stop.apply(null, args);
                 expect(Tracking.marks.measure).toHaveBeenCalledWith(
-                    args[0], 'Start: ' + args[0], 'Stop: ' + args[0], null, args[2]
+                    args[0], 'Start: ' + args[0], 'Stop: ' + args[0], {custom: 'value'}, args[2]
                 );
             });
 

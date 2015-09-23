@@ -91,6 +91,9 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          *  should be cleared and which should be removed from the
          *  internal cache and no longer sent with future tracking
          *  data.
+         * @param {Boolean=false} collect Set to `true` to notify
+         *  any collectors that the context has been unset. Otherwise,
+         *  no collectors will be notified.
          * @example
          * // automatically unsetting a context:
          * Tracking.static.setContext('screen', 'welcome');
@@ -104,7 +107,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.setContext('dialog', 'help');
          * Tracking.static.unsetContext('dialog');
          */
-        Static.unsetContext = function unsetContext(type) {
+        Static.unsetContext = function unsetContext(type, collect) {
             var allLevels = levels.concat(type),
                 index = allLevels.indexOf(type);
             allLevels.slice(index).forEach(function clearContext(level) {
@@ -119,6 +122,15 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                     }
                 }
             });
+            if (!!collect && index !== -1) {
+                // notify any collectors that the context
+                // has been unset
+                Tracking.collectors.collect(new TrackingInfo({
+                    label: '',
+                    type: 'context',
+                    category: type
+                }));
+            }
         };
 
         /**

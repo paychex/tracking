@@ -202,7 +202,7 @@ define([
          */
         Marks.stop = function stop(name, data, between) {
             Marks.set('Stop: ' + name, data);
-            Marks.measure(name, 'Start: ' + name, 'Stop: ' + name, null, between);
+            Marks.measure(name, 'Start: ' + name, 'Stop: ' + name, data, between);
         };
 
         /**
