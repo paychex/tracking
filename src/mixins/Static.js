@@ -91,7 +91,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          *  should be cleared and which should be removed from the
          *  internal cache and no longer sent with future tracking
          *  data.
-         * @param {Boolean=false} collect Set to `true` to notify
+         * @param {Boolean} [collect=false] Set to `true` to notify
          *  any collectors that the context has been unset. Otherwise,
          *  no collectors will be notified.
          * @example
