@@ -1,5 +1,5 @@
 /* global define, window, setInterval: false */
-define(['../TrackingInfo'], function(TrackingInfo) {
+define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
     
     'use strict';
     
@@ -31,8 +31,8 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                 return new TrackingInfo({
                     type: 'network',
                     label: timing.name,
-                    start: timing.startTime,
-                    stop: timing.responseEnd,
+                    start: Marks.navigationStart + timing.startTime,
+                    stop: Marks.navigationStart + timing.responseEnd,
                     category: timing.initiatorType,
                     count: resourceCounts[timing.name] = (resourceCounts[timing.name] || 0) + 1,
                     data: {
@@ -41,28 +41,28 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                         blockTime: Math.max(0, (timing.requestStart || timing.fetchStart) - timing.startTime),
                         stages: {
                             fetch: {
-                                start: timing.fetchStart,
-                                end: timing.domainLookupStart,
+                                start: Marks.navigationStart + timing.fetchStart,
+                                end: Marks.navigationStart + timing.domainLookupStart,
                                 duration: timing.domainLookupStart - timing.fetchStart
                             },
                             dns: {
-                                start: timing.domainLookupStart,
-                                end: timing.domainLookupEnd,
+                                start: Marks.navigationStart + timing.domainLookupStart,
+                                end: Marks.navigationStart + timing.domainLookupEnd,
                                 duration: timing.domainLookupEnd - timing.domainLookupStart
                             },
                             tcp: {
-                                start: timing.connectStart,
-                                end: timing.connectEnd,
+                                start: Marks.navigationStart + timing.connectStart,
+                                end: Marks.navigationStart + timing.connectEnd,
                                 duration: timing.connectEnd - timing.connectStart
                             },
                             request: {
-                                start: timing.requestStart,
-                                end: timing.responseStart,
+                                start: Marks.navigationStart + timing.requestStart,
+                                end: Marks.navigationStart + timing.responseStart,
                                 duration: timing.responseStart - timing.requestStart
                             },
                             response: {
-                                start: timing.responseStart,
-                                end: timing.responseEnd,
+                                start: Marks.navigationStart + timing.responseStart,
+                                end: Marks.navigationStart + timing.responseEnd,
                                 duration: timing.responseEnd - timing.responseStart
                             }
                         }
@@ -72,7 +72,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
 
             collectTimings = function collectNetworkTimings() {
 
-                var entries = Network.getEntries()
+                var entries = perf.getEntriesByType('resource')
                     .slice(lastLength)
                     .map(getTimingInfo);
 

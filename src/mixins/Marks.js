@@ -313,6 +313,8 @@ define([
             }];
         };
 
+        Marks.navigationStart = navStart;
+
         Marks.reset();
 
         return Marks;
