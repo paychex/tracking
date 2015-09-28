@@ -19,9 +19,10 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          *  collected by the browser. If the browser does not implement
          *  the HTML5 Performance API, the array will always be empty.
          */
-        Network.getEntries = function getEntries() { return []; };
+        Network.getEntries = function getEntries() { return timings.concat(); };
 
-        var lastLength = 0,
+        var timings = [],
+            lastLength = 0,
             resourceCounts = {},
             perf = window.performance,
             persist = Tracking.collectors.collect.bind(Tracking.collectors),
@@ -76,20 +77,21 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                     .map(getTimingInfo);
 
                 entries.forEach(persist);
+                timings = timings.concat(entries);
                 lastLength += entries.length;
 
             };
         
         if (!!perf && !!perf.getEntriesByType) {
 
-            Network.getEntries = perf.getEntriesByType.bind(perf, 'resource');
+            var bufferFull = function bufferFull() {
+                collectTimings();
+                perf.clearResourceTimings && perf.clearResourceTimings();
+                perf.webkitClearResourceTimings && perf.webkitClearResourceTimings();
+                lastLength = 0;
+            };
 
-            /* jshint -W030 */
-            perf.addEventListener && perf.addEventListener('onresourcetimingbufferfull',
-                function bufferFull() {
-                    collectTimings();
-                    lastLength = 0;
-                });
+            perf.onresourcetimingbufferfull = perf.onwebkitresourcetimingbufferfull = bufferFull;
 
             setInterval(collectTimings, 1000);
 
