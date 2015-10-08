@@ -90,7 +90,7 @@ define([
                 }
 
                 if (!!window.performance) {
-                    window.performance.measure(name, start, stop);
+                    window.performance.measure(name, start || undefined, stop || undefined);
                 }
 
                 measures.push(instance);
