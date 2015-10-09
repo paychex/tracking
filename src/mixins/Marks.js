@@ -90,7 +90,15 @@ define([
                 }
 
                 if (!!window.performance) {
-                    window.performance.measure(name, start || undefined, stop || undefined);
+                    // workaround for some versions of IE
+                    // see https://connect.microsoft.com/IE/feedbackdetail/view/1884529/bug-in-html5-performance-api
+                    if (!start) {
+                        window.performance.measure(name);
+                    } else if (!stop) {
+                        window.performance.measure(name, start || undefined);
+                    } else {
+                        window.performance.measure(name, start || undefined, stop || undefined);
+                    }
                 }
 
                 measures.push(instance);
