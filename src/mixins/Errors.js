@@ -26,10 +26,14 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             if (!(error instanceof Error)) {
                 throw new Error('An Error instance must be specified.');
             }
-            
-            Tracking.collectors.collect(new TrackingInfo({
+
+            var info = new TrackingInfo({
                 type: 'error', data: error
-            }));
+            });
+
+            info.data.stack = error.stack; // need to invoke stack getter
+            
+            Tracking.collectors.collect(info);
             
         };
         
