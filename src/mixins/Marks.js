@@ -124,7 +124,8 @@ define([
                 },
 
                 fn = !!window.performance && !!window.performance[fnName] ?
-                    window.performance[fnName] : function nop() {};
+                    window.performance[fnName].bind(window.performance) :
+                    Function.prototype; // nop
 
             arr.filter(test).forEach(function remove(item) {
                 if (arr !== marks || item.label !== 'navigationStart') {
