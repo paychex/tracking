@@ -1,5 +1,5 @@
 {
-  "name": "Tracking",
+  "name": "paychex-tracking",
   "version": "1.0.0",
   "description": "Provides various tracking metrics for JavaScript applications.",
   "main": "index.js",
@@ -16,17 +16,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/daninnewyork/Tracking.git"
+    "url": "git://github.com/paychex/tracking.git"
   },
   "keywords": [
-    "tracking"
+    "tracking",
+    "analytics",
+    "javascript",
+    "event",
+    "timer",
+    "mark",
+    "measure",
+    "dimension",
+    "metric",
+    "context"
   ],
-  "author": "Dan Barnes",
-  "license": "MIT",
+  "author": "Paychex, Inc.",
+  "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/daninnewyork/Tracking/issues"
+    "url": "https://github.com/paychex/tracking/issues"
   },
-  "homepage": "https://github.com/daninnewyork/Tracking",
+  "homepage": "https://github.com/paychex/tracking",
   "dependencies": {
     "requirejs": "^2.1.19"
   },
