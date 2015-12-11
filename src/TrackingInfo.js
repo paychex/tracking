@@ -122,7 +122,7 @@ define(['./Stopwatch'], function(Stopwatch) {
          *  1/1/1970 before this instance was stopped. If not
          *  provided, defaults to the start time.
          */
-        this.stop = getValue(params, 'stop', 'stopTime', this.start);
+        this.stop = getValue(params, 'stop', 'stopTime', 'end', 'endTime', this.start);
 
         /**
          * @member {Number} [TrackingInfo#duration] The number of milliseconds
