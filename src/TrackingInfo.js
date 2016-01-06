@@ -134,7 +134,7 @@ define(['./Stopwatch'], function(Stopwatch) {
          * @member {String} [TrackingInfo#label] The label to associate with
          *  this instance. 
          */
-        this.label = getValue(params, 'label', undefined);
+        this.label = getValue(params, 'label', 'description', undefined);
 
         /**
          * @member {String} [TrackingInfo#action] The action to associate with
