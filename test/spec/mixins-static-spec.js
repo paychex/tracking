@@ -155,6 +155,19 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
 
         });
 
+        describe('getDimension', function() {
+
+            it('retrieves set dimension', function() {
+                setDimension.call(this, 'dim', 'value');
+                expect(Tracking.static.getDimension('dim')).toBe('value');
+            });
+
+            it('returns undefined for unset dimension', function() {
+                expect(Tracking.static.getDimension('dim')).toBeUndefined();
+            });
+
+        });
+
         describe('setContext', function() {
 
             it('sends "context" type TrackingInfo', function() {
@@ -179,6 +192,19 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                     )
                 });
                 Tracking.static.setMetric('screen', 'metric1', 200);
+            });
+
+        });
+
+        describe('getContext', function() {
+
+            it('retrieves set context', function() {
+                setContext.call(this, 'page', 'page context');
+                expect(Tracking.static.getContext('page')).toBe('page context');
+            });
+
+            it('returns "not set" for unset context', function() {
+                expect(Tracking.static.getContext('page')).toBe('not set');
             });
 
         });
@@ -313,6 +339,19 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                     )
                 });
                 Tracking.static.setContext('app', 'my-app-context');
+            });
+
+        });
+
+        describe('getMetric', function() {
+
+            it('retrieves set metric', function() {
+                setMetric.call(this, 'app', 'key', 'value');
+                expect(Tracking.static.getMetric('app', 'key')).toBe('value');
+            });
+
+            it('returns undefined for unset metric', function() {
+                expect(Tracking.static.getMetric('app', 'key')).toBeUndefined();
             });
 
         });

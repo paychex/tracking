@@ -81,6 +81,14 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         };
 
         /**
+         * @todo unit test
+         * @todo document
+         */
+        Static.getContext = function getContext(type) {
+            return context[type];
+        };
+
+        /**
          * Clears any custom metrics associated with the specified
          * context type (page, app, screen, or a custom value), then
          * removes that context from the cached list. The context
@@ -176,6 +184,14 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         };
 
         /**
+         * @todo document
+         * @todo unit test
+         */
+        Static.getMetric = function getMetric(type, name) {
+            return metrics[type] && metrics[type][name];
+        };
+
+        /**
          * Adds a new custom dimension to the internal collection. A
          * dimension represents some way you wish to segment your
          * collected tracking data. Common examples are by product
@@ -203,6 +219,14 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                 variable: value === undefined || value === null ?
                     '' : value.toString()
             }));
+        };
+
+        /**
+         * @todo unit test
+         * @todo document
+         */
+        Static.getDimension = function getDimension(name) {
+            return dimensions[name];
         };
         
         /**

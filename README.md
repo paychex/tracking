@@ -253,6 +253,13 @@ Unlike the hierarchical built-in contexts, custom contexts must be un-set manual
     Tracking.static.unsetContext('tour-wizard-step');
 ```
 
+You can also retrieve any set contexts by specifying the context type:
+
+```javascript
+    Tracking.static.getContext('dialog'); // 'help'
+    Tracking.static.getContext('panel'); // 'messages'
+```
+
 #### Metrics and Dimensions ####
 
 There's a lot more to contexts than just tracking a user's flow through your application -- contexts can also have
@@ -276,6 +283,13 @@ Non-numeric values work just as well:
 
 Basically, anything that can be grouped or bucketed is useful as a metric.
 
+Retrieve any set metrics by specifying the context type and metric name:
+
+```javascript
+    Tracking.static.getMetric('page', 'deviceType'); // 'phone'
+    Tracking.static.getMetric('app', 'testGroup'); // 'minimal-ui'
+```
+
 Finally, **dimensions** are used to segment your users. You can have any number of dimensions you want, but best
 practice is to segment based on marketing data:
 
@@ -286,6 +300,13 @@ practice is to segment based on marketing data:
 ```
 
 Unlike metrics, dimensions should be string values.
+
+You can also retrieve any set dimensions by specifying the name:
+
+```javascript
+    Tracking.static.getDimension('region'); // 'northeast'
+    Tracking.static.getDimension('support-level'); // 'gold'
+```
 
 Dimensions and metrics work together like a pivot table, where a dimension's values act like the column header and
 a metric's values acting like rows:
