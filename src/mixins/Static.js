@@ -81,11 +81,16 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         };
 
         /**
-         * @todo unit test
-         * @todo document
+         * Retrieves the value set for the given context (or 'not set', if
+         * no context has yet been set).
+         * @function Static.getContext
+         * @param {String} type The name of the context (the context type).
+         * @example
+         * Tracking.static.getContext('screen'); // 'main'
+         * Tracking.static.getContext('app'); // 'myAppName'
          */
         Static.getContext = function getContext(type) {
-            return context[type];
+            return context[type] || 'not set';
         };
 
         /**
@@ -184,8 +189,15 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         };
 
         /**
-         * @todo document
-         * @todo unit test
+         * Retrieves the value set for the custom metric under the specified
+         * context (or `undefined`, if no metric was set for the specified
+         * context).
+         * @function Static.getMetric
+         * @param {String} type The name of the context (the context type).
+         * @param {String} name The name of the metric.
+         * @example
+         * Tracking.static.getMetric('app', 'mode'); // 'admin'
+         * Tracking.static.getMetric('page', 'loginTime'); // [Date]
          */
         Static.getMetric = function getMetric(type, name) {
             return metrics[type] && metrics[type][name];
@@ -222,8 +234,13 @@ define(['../TrackingInfo'], function(TrackingInfo) {
         };
 
         /**
-         * @todo unit test
-         * @todo document
+         * Retrieves the value set for the custom dimension (or `undefined`,
+         * if no value was set).
+         * @function Static.getDimension
+         * @param {String} name The name of the custom dimension.
+         * @example
+         * Tracking.static.getDimension('region'); // 'northeast'
+         * Tracking.static.getDimension('support-level'); // 'gold'
          */
         Static.getDimension = function getDimension(name) {
             return dimensions[name];
