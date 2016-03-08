@@ -50,5 +50,6 @@
     "karma-requirejs": "^0.2.2",
     "karma-story-reporter": "^0.3.1",
     "phantomjs": "^1.9.18"
-  }
+  },
+  "private": false
 }
