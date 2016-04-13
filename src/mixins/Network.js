@@ -26,6 +26,9 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
             resourceCounts = {},
             perf = window.performance,
             persist = Tracking.collectors.collect.bind(Tracking.collectors),
+            isInvalidTiming = function isInvalid(timing) {
+                return timing.responseEnd < timing.requestStart;
+            },
             
             getTimingInfo = function getTimingInfo(timing) {
                 return new TrackingInfo({
@@ -72,7 +75,31 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
 
             collectTimings = function collectNetworkTimings() {
 
-                var entries = perf.getEntriesByType('resource')
+                /*
+                 IE 11/Edge will add resource timing entries before
+                 the request has completed. This can seriously throw
+                 off our data.
+
+                 We need to ignore these entries somehow until they're
+                 complete, without ignoring them on subsequent checks
+                 once they've finally finished.
+
+                 Also, keeping these values around could cause entries
+                 to be dropped once IE reaches its cached resource limit
+                 (around 150 entries) and the "resourcetimingbufferfull"
+                 event fires.
+                 */
+
+                var entries = perf.getEntriesByType('resource');
+                if (entries.some(isInvalidTiming)) {
+                    return; // if any timings are invalid, exit early
+                    // NOTE:
+                    // this method is invoked every second, so once IE
+                    // finally settles down (or the cache limit is
+                    // reached), we will eventually send the timings
+                }
+
+                entries = entries
                     .slice(lastLength)
                     .map(getTimingInfo);
 
