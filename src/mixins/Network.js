@@ -90,7 +90,7 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
                  event fires.
                  */
 
-                var entries = perf.getEntriesByType('resource');
+                var entries = perf.getEntriesByType('resource').slice(lastLength);
                 if (entries.some(isInvalidTiming)) {
                     return; // if any timings are invalid, exit early
                     // NOTE:
@@ -99,9 +99,7 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
                     // reached), we will eventually send the timings
                 }
 
-                entries = entries
-                    .slice(lastLength)
-                    .map(getTimingInfo);
+                entries = entries.map(getTimingInfo);
 
                 entries.forEach(persist);
                 timings = timings.concat(entries);
