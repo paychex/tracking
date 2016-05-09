@@ -1419,14 +1419,16 @@ define('mixins/Network',['../TrackingInfo', './Marks'], function(TrackingInfo, M
                  event fires.
                  */
 
-                var entries = perf.getEntriesByType('resource');
+                var entries = perf.getEntriesByType('resource').slice(lastLength);
                 if (entries.some(isInvalidTiming)) {
                     return; // if any timings are invalid, exit early
+                    // NOTE:
+                    // this method is invoked every second, so once IE
+                    // finally settles down (or the cache limit is
+                    // reached), we will eventually send the timings
                 }
 
-                entries = entries
-                    .slice(lastLength)
-                    .map(getTimingInfo);
+                entries = entries.map(getTimingInfo);
 
                 entries.forEach(persist);
                 timings = timings.concat(entries);
