@@ -474,11 +474,10 @@ define('Stopwatch',[], function() {
     return Stopwatch;
     
 });
-/* global window, define, Uint8Array: false */
-define('TrackingInfo',['./Stopwatch'], function(Stopwatch) {
-    
+define('uuid',[], function() {
+
     'use strict';
-    
+
     function getRandomValues(count) {
         var rands, d;
         if (window.crypto && window.crypto.getRandomValues) {
@@ -494,15 +493,22 @@ define('TrackingInfo',['./Stopwatch'], function(Stopwatch) {
         return rands;
     }
 
-    function generateUUID() {
+    return function generateUUID() {
         var values = getRandomValues(36);
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
             .replace(/[xy]/g, function(c, i) {
                 var r = values[i] & 15;
                 return (c === 'x' ? r : (r & 0x3|0x8)).toString(16);
             });
-    }
+    };
+
+});
+
+/* global window, define, Uint8Array: false */
+define('TrackingInfo',['./Stopwatch', './uuid'], function(Stopwatch, generateUUID) {
     
+    'use strict';
+
     function firstDefined() {
         var args = [].slice.call(arguments),
             result = args.shift();
@@ -1931,7 +1937,8 @@ define('Tracking',[
     'mixins/Marks',
     'mixins/Network',
     'mixins/Static',
-    'mixins/Collectors'
+    'mixins/Collectors',
+    './uuid'
 ], function(
     Errors,
     Events,
@@ -1939,7 +1946,8 @@ define('Tracking',[
     Marks,
     Network,
     Static,
-    Collectors
+    Collectors,
+    generateUUID
 ) {
 
     'use strict';
@@ -1976,6 +1984,12 @@ define('Tracking',[
 
     /** @member {Network} Tracking.network */
     mixin('network', Network);
+
+    /**
+     * @member {Function} Tracking.generateUUID
+     * @description Invoke to generate a universally unique identifier.
+     */
+    Tracking.generateUUID = generateUUID;
 
     return Tracking;
     

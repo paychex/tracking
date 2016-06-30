@@ -31,7 +31,8 @@ define([
     'mixins/Marks',
     'mixins/Network',
     'mixins/Static',
-    'mixins/Collectors'
+    'mixins/Collectors',
+    './uuid'
 ], function(
     Errors,
     Events,
@@ -39,7 +40,8 @@ define([
     Marks,
     Network,
     Static,
-    Collectors
+    Collectors,
+    generateUUID
 ) {
 
     'use strict';
@@ -76,6 +78,12 @@ define([
 
     /** @member {Network} Tracking.network */
     mixin('network', Network);
+
+    /**
+     * @member {Function} Tracking.generateUUID
+     * @description Invoke to generate a universally unique identifier.
+     */
+    Tracking.generateUUID = generateUUID;
 
     return Tracking;
     
