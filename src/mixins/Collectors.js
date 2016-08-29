@@ -143,11 +143,7 @@ define([], function() {
          *  decorate and either cache or send to collectors.
          */
         this.collect = function collect(info) {
-
             parent && parent.collectors.collect(info);
-
-            // FIXME: decorators will need to be instance-specific, if necessary (if closure doesn't work)
-
             info = decorators.reduce(decorate, info);
             if (isPaused) {
                 queue[queue.length] = info;
