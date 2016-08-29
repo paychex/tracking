@@ -9,7 +9,7 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
      * downloaded by the site or by the user during his session.
      * @class Network
      */
-    return function Network(Tracking) {
+    return function Network(persist) {
         
         /**
          * Returns an array any PerformanceTimingEntry instances
@@ -25,7 +25,6 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
             lastLength = 0,
             resourceCounts = {},
             perf = window.performance,
-            persist = Tracking.collectors.collect.bind(Tracking.collectors),
             isInvalidTiming = function isInvalid(timing) {
                 return timing.responseEnd < timing.requestStart;
             },

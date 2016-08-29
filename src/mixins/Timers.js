@@ -16,7 +16,7 @@ define([
      * Factory class to create {@link Timer} instances.
      * @class Timers
      */
-    return function Timers(Tracking) {
+    return function Timers(collect) {
 
         function validate(timer) {
 
@@ -190,7 +190,7 @@ define([
             this.state = Timer.States.STOPPED;
             this.count = counts[this.label] = (counts[this.label] || 0) + 1;
             if (this.parent === null) {
-                Tracking.collectors.collect(new TrackingInfo(this));
+                collect(new TrackingInfo(this));
             }
         };
         

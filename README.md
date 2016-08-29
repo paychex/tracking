@@ -125,6 +125,33 @@ conditional. For example:
 This flexibility enables you to easily construct helpful queries in your analysis tools by placing your conditional
 logic in the UI instead of the back-end.
 
+### Creating Child Tracking Instances ###
+
+You can also create nested collectors and decorators. To do this, simply call the `createChild` method on your
+Tracking instance, then use the collector methods as usual:
+
+```javascript
+    Tracking.collectors.decorate(function parentDecorator(info) {
+        info.data.fromParent = true;
+    });
+    var child = Tracking.createChild();
+    child.collectors.decorate(function childDecorator(info) {
+        info.data.fromChild = true;
+    });
+    // will be decorated with BOTH the fromParent and fromChild properties:
+    child.events.fire('test-event');
+```
+
+Collectors can also be nested. If you want a child Tracking instance to have its own *extra* set of collectors,
+you can add them directly to that instance:
+
+```javascript
+    var child = Tracking.createChild();
+    child.collectors.add({collect: function collect(info) {
+        // custom child-specific collection logic here
+    }});
+```
+
 ---
 
 Okay, now let's look at the fun stuff: how to use the Tracking API to track various analytics.

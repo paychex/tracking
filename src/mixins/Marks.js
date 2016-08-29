@@ -141,7 +141,7 @@ define([
      * behavior, and to measure the time between any of those marks.
      * @class Marks
      */
-    return function Marks(Tracking) {
+    return function Marks(collect) {
 
         /**
          * Identifies a specific moment of time in the application
@@ -165,7 +165,7 @@ define([
                 throw new Error('A mark name must be specified.');
             }
 
-            Tracking.collectors.collect(new TrackingInfo(polyMark(name, data)));
+            collect(new TrackingInfo(polyMark(name, data)));
 
         };
 
@@ -256,7 +256,7 @@ define([
 
             var instance = polyMeasure(name, start, stop, data, between);
             if (!!instance) {
-                Tracking.collectors.collect(new TrackingInfo(instance));
+                collect(new TrackingInfo(instance));
             }
 
         };

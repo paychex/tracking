@@ -670,7 +670,7 @@ define('mixins/Errors',['../TrackingInfo'], function(TrackingInfo) {
      * Logs errors.
      * @class Errors
      */
-    return function Errors(Tracking) {
+    return function Errors(collect) {
 
         /**
          * Records a single error that occurred.
@@ -696,7 +696,7 @@ define('mixins/Errors',['../TrackingInfo'], function(TrackingInfo) {
 
             info.data.stack = error.stack; // need to invoke stack getter
             
-            Tracking.collectors.collect(info);
+            collect(info);
             
         };
         
@@ -714,7 +714,7 @@ define('mixins/Events',['../TrackingInfo'], function(TrackingInfo) {
      * Tracks user behavior and data in the form of one-time events.
      * @class Events
      */
-    return function Events(Tracking) {
+    return function Events(collect) {
 
         /**
          * Records a single action taken by the user.
@@ -739,7 +739,7 @@ define('mixins/Events',['../TrackingInfo'], function(TrackingInfo) {
                 throw new Error('An event action must be specified.');
             }
             
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 action: action, data: data, type: 'event'
             }));
             
@@ -768,7 +768,7 @@ define('mixins/Timers',[
      * Factory class to create {@link Timer} instances.
      * @class Timers
      */
-    return function Timers(Tracking) {
+    return function Timers(collect) {
 
         function validate(timer) {
 
@@ -942,7 +942,7 @@ define('mixins/Timers',[
             this.state = Timer.States.STOPPED;
             this.count = counts[this.label] = (counts[this.label] || 0) + 1;
             if (this.parent === null) {
-                Tracking.collectors.collect(new TrackingInfo(this));
+                collect(new TrackingInfo(this));
             }
         };
         
@@ -1142,7 +1142,7 @@ define('mixins/Marks',[
      * behavior, and to measure the time between any of those marks.
      * @class Marks
      */
-    return function Marks(Tracking) {
+    return function Marks(collect) {
 
         /**
          * Identifies a specific moment of time in the application
@@ -1166,7 +1166,7 @@ define('mixins/Marks',[
                 throw new Error('A mark name must be specified.');
             }
 
-            Tracking.collectors.collect(new TrackingInfo(polyMark(name, data)));
+            collect(new TrackingInfo(polyMark(name, data)));
 
         };
 
@@ -1257,7 +1257,7 @@ define('mixins/Marks',[
 
             var instance = polyMeasure(name, start, stop, data, between);
             if (!!instance) {
-                Tracking.collectors.collect(new TrackingInfo(instance));
+                collect(new TrackingInfo(instance));
             }
 
         };
@@ -1344,7 +1344,7 @@ define('mixins/Network',['../TrackingInfo', './Marks'], function(TrackingInfo, M
      * downloaded by the site or by the user during his session.
      * @class Network
      */
-    return function Network(Tracking) {
+    return function Network(persist) {
         
         /**
          * Returns an array any PerformanceTimingEntry instances
@@ -1360,7 +1360,6 @@ define('mixins/Network',['../TrackingInfo', './Marks'], function(TrackingInfo, M
             lastLength = 0,
             resourceCounts = {},
             perf = window.performance,
-            persist = Tracking.collectors.collect.bind(Tracking.collectors),
             isInvalidTiming = function isInvalid(timing) {
                 return timing.responseEnd < timing.requestStart;
             },
@@ -1474,7 +1473,7 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
      * to being persisted to registered collectors.
      * @class Static
      */
-    return function Static(Tracking) {
+    return function Static(collect, decorate) {
 
         var levels = ['page', 'app', 'screen'],
 
@@ -1482,17 +1481,27 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
             dimensions = {},
             context = {},
 
-            clone = function clone(obj) {
-                obj = obj || {};
-                return Object.keys(obj).reduce(function copy(result, key) {
-                    return result[key] = obj[key], result;
-                }, {});
+            toString = Object.prototype.toString,
+            objectKey = '[object Object]',
+
+            merge = function merge(target) {
+                target = target || {};
+                return Array.prototype.slice.call(arguments, 1).reduce(function outerCopy(result, source) {
+                    return Object.keys(source).reduce(function copy(result, key) {
+                        if (toString.call(source[key]) === objectKey) {
+                            result[key] = merge(result[key], source[key]);
+                        } else {
+                            result[key] = source[key];
+                        }
+                        return result;
+                    }, result);
+                }, target);
             };
 
-        Tracking.collectors.decorate(function setMetaData(info) {
-            info.data.context = clone(context);
-            info.data.metrics = clone(metrics);
-            info.data.dimensions = clone(dimensions);
+        decorate(function setMetaData(info) {
+            info.data.context = merge(info.data.context, context);
+            info.data.metrics = merge(info.data.metrics, metrics);
+            info.data.dimensions = merge(info.data.dimensions, dimensions);
         });
 
         /**
@@ -1534,10 +1543,10 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          *      // be sent with this and future events, but not the
          *      // previous screen value
          */
-        Static.setContext = function setContext(type, name, data) {
-            Static.unsetContext(type);
+        this.setContext = function setContext(type, name, data) {
+            this.unsetContext(type);
             context[type] = name;
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 type: 'context',
                 label: name,
                 data: data || {},
@@ -1554,7 +1563,7 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.getContext('screen'); // 'main'
          * Tracking.static.getContext('app'); // 'myAppName'
          */
-        Static.getContext = function getContext(type) {
+        this.getContext = function getContext(type) {
             return context[type] || 'not set';
         };
 
@@ -1569,7 +1578,7 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          *  should be cleared and which should be removed from the
          *  internal cache and no longer sent with future tracking
          *  data.
-         * @param {Boolean} [collect=false] Set to `true` to notify
+         * @param {Boolean} [shouldCollect=false] Set to `true` to notify
          *  any collectors that the context has been unset. Otherwise,
          *  no collectors will be notified.
          * @example
@@ -1585,7 +1594,7 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.setContext('dialog', 'help');
          * Tracking.static.unsetContext('dialog');
          */
-        Static.unsetContext = function unsetContext(type, collect) {
+        this.unsetContext = function unsetContext(type, shouldCollect) {
             var allLevels = levels.concat(type),
                 index = allLevels.indexOf(type);
             allLevels.slice(index).forEach(function clearContext(level) {
@@ -1593,17 +1602,17 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
                 if (levels.indexOf(type) === -1) {
                     delete context[level];
                 }
-                var mets = clone(metrics[level]);
+                var mets = merge(metrics[level]);
                 for(var metric in mets) {
                     if (mets.hasOwnProperty(metric)) {
-                        Static.setMetric(level, metric);
+                        this.setMetric(level, metric);
                     }
                 }
-            });
-            if (!!collect && index !== -1) {
+            }.bind(this));
+            if (!!shouldCollect && index !== -1) {
                 // notify any collectors that the context
                 // has been unset
-                Tracking.collectors.collect(new TrackingInfo({
+                collect(new TrackingInfo({
                     label: '',
                     type: 'context',
                     category: type
@@ -1634,7 +1643,7 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.metric.setMetric('app', 'mode');
          * Tracking.metric.setMetric('app', 'mode', '');
          */
-        Static.setMetric = function setMetric(type, name, value) {
+        this.setMetric = function setMetric(type, name, value) {
             metrics[type] = metrics[type] || {};
             metrics[type][name] = value;
             if (typeof value === 'undefined' || value === '') {
@@ -1645,7 +1654,7 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
                 !Object.keys(metrics[type]).length) {
                 delete metrics[type];
             }
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 label: name,
                 type: 'metric',
                 category: type,
@@ -1664,7 +1673,7 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.getMetric('app', 'mode'); // 'admin'
          * Tracking.static.getMetric('page', 'loginTime'); // [Date]
          */
-        Static.getMetric = function getMetric(type, name) {
+        this.getMetric = function getMetric(type, name) {
             return metrics[type] && metrics[type][name];
         };
 
@@ -1684,12 +1693,12 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.setDimension('support-level', 'gold');
          * Tracking.events.fire('user data loaded');
          */
-        Static.setDimension = function setDimension(name, value) {
+        this.setDimension = function setDimension(name, value) {
             dimensions[name] = value;
             if (value === undefined || value === '') {
                 delete dimensions[name];
             }
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 label: name,
                 type: 'dimension',
                 /* jshint -W041 */
@@ -1707,14 +1716,14 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.getDimension('region'); // 'northeast'
          * Tracking.static.getDimension('support-level'); // 'gold'
          */
-        Static.getDimension = function getDimension(name) {
+        this.getDimension = function getDimension(name) {
             return dimensions[name];
         };
         
         /**
          * @private
          */
-        Static.reset = function reset() {
+        this.reset = function reset() {
             metrics = {};
             dimensions = {};
             context = {};
@@ -1724,10 +1733,6 @@ define('mixins/Static',['../TrackingInfo'], function(TrackingInfo) {
             });
         };
 
-        Static.reset();
-
-        return Static;
-        
     };
     
 });
@@ -1747,7 +1752,7 @@ define('mixins/Collectors',[], function() {
      * cached TrackingInfo instances to be persisted.
      * @class Collectors
      */
-    return function Collectors() {
+    function Collectors(Tracking, parent) {
 
         var queue = [],
             isPaused = true,
@@ -1785,12 +1790,12 @@ define('mixins/Collectors',[], function() {
          * Tracking.collectors.add(collector);
          * Tracking.collectors.remove(collector);
          */
-        Collectors.add = function add(collector) {
+        this.add = function add(collector) {
             if (!collector || typeof collector.collect !== 'function') {
                 throw new Error('Collectors must have a `collect` method.');
             }
             collectors.push(collector);
-            return Collectors.remove.bind(null, collector);
+            return this.remove.bind(null, collector);
         };
 
         /**
@@ -1802,7 +1807,7 @@ define('mixins/Collectors',[], function() {
          * Tracking.collectors.add(collector);
          * Tracking.collectors.remove(collector);
          */
-        Collectors.remove = function remove(collector) {
+        this.remove = function remove(collector) {
             collectors.splice(collectors.indexOf(collector), 1);
         };
 
@@ -1829,7 +1834,7 @@ define('mixins/Collectors',[], function() {
          *   }
          * });
          */
-        Collectors.decorate = function addDecorator(decorator) {
+        this.decorate = function addDecorator(decorator) {
             if (typeof decorator !== 'function') {
                 throw new Error('Parameter `decorator` must be a function.');
             }
@@ -1849,7 +1854,7 @@ define('mixins/Collectors',[], function() {
          * Tracking.collectors.add(consoleCollector);
          * Tracking.collectors.enable();
          */
-        Collectors.enable = function enable() {
+        this.enable = function enable() {
             isPaused = false;
             queue.forEach(persist);
             queue = [];
@@ -1862,7 +1867,7 @@ define('mixins/Collectors',[], function() {
          * instance.
          * @function Collectors.disable
          */
-        Collectors.disable = function disable() {
+        this.disable = function disable() {
             isPaused = true;
         };
 
@@ -1876,7 +1881,12 @@ define('mixins/Collectors',[], function() {
          * @param {TrackingInfo} info The TrackingInfo instance to
          *  decorate and either cache or send to collectors.
          */
-        Collectors.collect = function collect(info) {
+        this.collect = function collect(info) {
+
+            parent && parent.collectors.collect(info);
+
+            // FIXME: decorators will need to be instance-specific, if necessary (if closure doesn't work)
+
             info = decorators.reduce(decorate, info);
             if (isPaused) {
                 queue[queue.length] = info;
@@ -1888,7 +1898,7 @@ define('mixins/Collectors',[], function() {
         /**
          * @private
          */
-        Collectors.reset = function reset() {
+        this.reset = function reset() {
             queue = [];
             collectors = [];
             isPaused = true;
@@ -1898,9 +1908,9 @@ define('mixins/Collectors',[], function() {
             // its decorator applied
         };
 
-        return Collectors;
-        
-    };
+    }
+
+    return Collectors;
     
 });
 
@@ -1958,40 +1968,63 @@ define('Tracking',[
      * @class Tracking
      * @static
      */
-    function Tracking() {}
+    function Tracking(parent) {
 
-    function mixin(name, constructor) {
-        Tracking[name] = constructor(Tracking);
+        /** @member {Collectors} Tracking#collectors */
+        this.collectors = new Collectors(this, parent);
+
+        var collect = this.collectors.collect.bind(this.collectors),
+            decorate = this.collectors.decorate.bind(this.collectors);
+
+        /** @member {Errors} Tracking#errors */
+        this.errors = Errors(collect);
+
+        /** @member {Events} Tracking#events */
+        this.events = Events(collect);
+
+        /** @member {Timers} Tracking#timers */
+        this.timers = Timers(collect);
+
+        /** @member {Marks} Tracking#marks */
+        this.marks = Marks(collect);
+
+        /** @member {Static} Tracking#static */
+        this.static = new Static(collect, decorate);
+
+        /** @member {Network} Tracking#network */
+        this.network = Network(collect);
+
+        /**
+         * @member {Function} Tracking#generateUUID
+         * @description Invoke to generate a universally unique identifier.
+         */
+        this.generateUUID = generateUUID;
+
     }
 
-    /** @member {Collectors} Tracking.collectors */
-    mixin('collectors', Collectors);
-
-    /** @member {Errors} Tracking.errors */
-    mixin('errors', Errors);
-
-    /** @member {Events} Tracking.events */
-    mixin('events', Events);
-
-    /** @member {Timers} Tracking.timers */
-    mixin('timers', Timers);
-
-    /** @member {Marks} Tracking.marks */
-    mixin('marks', Marks);
-
-    /** @member {Static} Tracking.static */
-    mixin('static', Static);
-
-    /** @member {Network} Tracking.network */
-    mixin('network', Network);
-
     /**
-     * @member {Function} Tracking.generateUUID
-     * @description Invoke to generate a universally unique identifier.
+     * Create a new Tracking instance that inherits any decorators applied
+     * to the parent instance. Children can be created to any depth -- every
+     * TrackingInfo instance created by a child will be decorated by each of
+     * its ancestors, starting with the top-most ancestor and working down.
+     * @function Tracking#createChild
+     * @returns {Tracking} A new child Tracking instance that inherits any
+     *  decorators attached to the parent instance.
+     * @example
+     * var parent = Tracking;
+     * var child = Tracking.createChild();
+     * parent.collectors.decorate(function decorator(info) {
+     *   info.data.decoratedByParent = true;
+     * });
+     * child.events.fire('event label', {category: 'child event'});
+     * // the event TrackingInfo will be given a 'decoratedByParent'
+     * // property because a decorator was added to the parent instance
      */
-    Tracking.generateUUID = generateUUID;
+    Tracking.prototype.createChild = function createChild() {
+        return new Tracking(this);
+    };
 
-    return Tracking;
+    return new Tracking();
     
 });
 
