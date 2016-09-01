@@ -7,7 +7,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
      * Tracks user behavior and data in the form of one-time events.
      * @class Events
      */
-    return function Events(Tracking) {
+    return function Events(collect) {
 
         /**
          * Records a single action taken by the user.
@@ -32,7 +32,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                 throw new Error('An event action must be specified.');
             }
             
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 action: action, data: data, type: 'event'
             }));
             

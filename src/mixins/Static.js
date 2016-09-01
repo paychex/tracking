@@ -9,7 +9,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
      * to being persisted to registered collectors.
      * @class Static
      */
-    return function Static(Tracking) {
+    return function Static(collect, decorate) {
 
         var levels = ['page', 'app', 'screen'],
 
@@ -17,17 +17,27 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             dimensions = {},
             context = {},
 
-            clone = function clone(obj) {
-                obj = obj || {};
-                return Object.keys(obj).reduce(function copy(result, key) {
-                    return result[key] = obj[key], result;
-                }, {});
+            toString = Object.prototype.toString,
+            objectKey = '[object Object]',
+
+            merge = function merge(target) {
+                target = target || {};
+                return Array.prototype.slice.call(arguments, 1).reduce(function outerCopy(result, source) {
+                    return Object.keys(source).reduce(function copy(result, key) {
+                        if (toString.call(source[key]) === objectKey) {
+                            result[key] = merge(result[key], source[key]);
+                        } else {
+                            result[key] = source[key];
+                        }
+                        return result;
+                    }, result);
+                }, target);
             };
 
-        Tracking.collectors.decorate(function setMetaData(info) {
-            info.data.context = clone(context);
-            info.data.metrics = clone(metrics);
-            info.data.dimensions = clone(dimensions);
+        decorate(function setMetaData(info) {
+            info.data.context = merge(info.data.context, context);
+            info.data.metrics = merge(info.data.metrics, metrics);
+            info.data.dimensions = merge(info.data.dimensions, dimensions);
         });
 
         /**
@@ -69,10 +79,10 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          *      // be sent with this and future events, but not the
          *      // previous screen value
          */
-        Static.setContext = function setContext(type, name, data) {
-            Static.unsetContext(type);
+        this.setContext = function setContext(type, name, data) {
+            this.unsetContext(type);
             context[type] = name;
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 type: 'context',
                 label: name,
                 data: data || {},
@@ -89,7 +99,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.getContext('screen'); // 'main'
          * Tracking.static.getContext('app'); // 'myAppName'
          */
-        Static.getContext = function getContext(type) {
+        this.getContext = function getContext(type) {
             return context[type] || 'not set';
         };
 
@@ -104,7 +114,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          *  should be cleared and which should be removed from the
          *  internal cache and no longer sent with future tracking
          *  data.
-         * @param {Boolean} [collect=false] Set to `true` to notify
+         * @param {Boolean} [shouldCollect=false] Set to `true` to notify
          *  any collectors that the context has been unset. Otherwise,
          *  no collectors will be notified.
          * @example
@@ -120,7 +130,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.setContext('dialog', 'help');
          * Tracking.static.unsetContext('dialog');
          */
-        Static.unsetContext = function unsetContext(type, collect) {
+        this.unsetContext = function unsetContext(type, shouldCollect) {
             var allLevels = levels.concat(type),
                 index = allLevels.indexOf(type);
             allLevels.slice(index).forEach(function clearContext(level) {
@@ -128,17 +138,17 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                 if (levels.indexOf(type) === -1) {
                     delete context[level];
                 }
-                var mets = clone(metrics[level]);
+                var mets = merge(metrics[level]);
                 for(var metric in mets) {
                     if (mets.hasOwnProperty(metric)) {
-                        Static.setMetric(level, metric);
+                        this.setMetric(level, metric);
                     }
                 }
-            });
-            if (!!collect && index !== -1) {
+            }.bind(this));
+            if (!!shouldCollect && index !== -1) {
                 // notify any collectors that the context
                 // has been unset
-                Tracking.collectors.collect(new TrackingInfo({
+                collect(new TrackingInfo({
                     label: '',
                     type: 'context',
                     category: type
@@ -169,7 +179,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.metric.setMetric('app', 'mode');
          * Tracking.metric.setMetric('app', 'mode', '');
          */
-        Static.setMetric = function setMetric(type, name, value) {
+        this.setMetric = function setMetric(type, name, value) {
             metrics[type] = metrics[type] || {};
             metrics[type][name] = value;
             if (typeof value === 'undefined' || value === '') {
@@ -180,7 +190,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                 !Object.keys(metrics[type]).length) {
                 delete metrics[type];
             }
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 label: name,
                 type: 'metric',
                 category: type,
@@ -199,7 +209,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.getMetric('app', 'mode'); // 'admin'
          * Tracking.static.getMetric('page', 'loginTime'); // [Date]
          */
-        Static.getMetric = function getMetric(type, name) {
+        this.getMetric = function getMetric(type, name) {
             return metrics[type] && metrics[type][name];
         };
 
@@ -219,12 +229,12 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.setDimension('support-level', 'gold');
          * Tracking.events.fire('user data loaded');
          */
-        Static.setDimension = function setDimension(name, value) {
+        this.setDimension = function setDimension(name, value) {
             dimensions[name] = value;
             if (value === undefined || value === '') {
                 delete dimensions[name];
             }
-            Tracking.collectors.collect(new TrackingInfo({
+            collect(new TrackingInfo({
                 label: name,
                 type: 'dimension',
                 /* jshint -W041 */
@@ -242,14 +252,14 @@ define(['../TrackingInfo'], function(TrackingInfo) {
          * Tracking.static.getDimension('region'); // 'northeast'
          * Tracking.static.getDimension('support-level'); // 'gold'
          */
-        Static.getDimension = function getDimension(name) {
+        this.getDimension = function getDimension(name) {
             return dimensions[name];
         };
         
         /**
          * @private
          */
-        Static.reset = function reset() {
+        this.reset = function reset() {
             metrics = {};
             dimensions = {};
             context = {};
@@ -259,10 +269,6 @@ define(['../TrackingInfo'], function(TrackingInfo) {
             });
         };
 
-        Static.reset();
-
-        return Static;
-        
     };
     
 });

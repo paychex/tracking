@@ -7,7 +7,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
      * Logs errors.
      * @class Errors
      */
-    return function Errors(Tracking) {
+    return function Errors(collect) {
 
         /**
          * Records a single error that occurred.
@@ -33,7 +33,7 @@ define(['../TrackingInfo'], function(TrackingInfo) {
 
             info.data.stack = error.stack; // need to invoke stack getter
             
-            Tracking.collectors.collect(info);
+            collect(info);
             
         };
         

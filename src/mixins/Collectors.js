@@ -13,7 +13,7 @@ define([], function() {
      * cached TrackingInfo instances to be persisted.
      * @class Collectors
      */
-    return function Collectors() {
+    function Collectors(Tracking, parent) {
 
         var queue = [],
             isPaused = true,
@@ -51,12 +51,12 @@ define([], function() {
          * Tracking.collectors.add(collector);
          * Tracking.collectors.remove(collector);
          */
-        Collectors.add = function add(collector) {
+        this.add = function add(collector) {
             if (!collector || typeof collector.collect !== 'function') {
                 throw new Error('Collectors must have a `collect` method.');
             }
             collectors.push(collector);
-            return Collectors.remove.bind(null, collector);
+            return this.remove.bind(null, collector);
         };
 
         /**
@@ -68,7 +68,7 @@ define([], function() {
          * Tracking.collectors.add(collector);
          * Tracking.collectors.remove(collector);
          */
-        Collectors.remove = function remove(collector) {
+        this.remove = function remove(collector) {
             collectors.splice(collectors.indexOf(collector), 1);
         };
 
@@ -95,7 +95,7 @@ define([], function() {
          *   }
          * });
          */
-        Collectors.decorate = function addDecorator(decorator) {
+        this.decorate = function addDecorator(decorator) {
             if (typeof decorator !== 'function') {
                 throw new Error('Parameter `decorator` must be a function.');
             }
@@ -115,7 +115,7 @@ define([], function() {
          * Tracking.collectors.add(consoleCollector);
          * Tracking.collectors.enable();
          */
-        Collectors.enable = function enable() {
+        this.enable = function enable() {
             isPaused = false;
             queue.forEach(persist);
             queue = [];
@@ -128,7 +128,7 @@ define([], function() {
          * instance.
          * @function Collectors.disable
          */
-        Collectors.disable = function disable() {
+        this.disable = function disable() {
             isPaused = true;
         };
 
@@ -142,7 +142,8 @@ define([], function() {
          * @param {TrackingInfo} info The TrackingInfo instance to
          *  decorate and either cache or send to collectors.
          */
-        Collectors.collect = function collect(info) {
+        this.collect = function collect(info) {
+            parent && parent.collectors.collect(info);
             info = decorators.reduce(decorate, info);
             if (isPaused) {
                 queue[queue.length] = info;
@@ -154,7 +155,7 @@ define([], function() {
         /**
          * @private
          */
-        Collectors.reset = function reset() {
+        this.reset = function reset() {
             queue = [];
             collectors = [];
             isPaused = true;
@@ -164,8 +165,8 @@ define([], function() {
             // its decorator applied
         };
 
-        return Collectors;
-        
-    };
+    }
+
+    return Collectors;
     
 });

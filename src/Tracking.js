@@ -52,39 +52,62 @@ define([
      * @class Tracking
      * @static
      */
-    function Tracking() {}
+    function Tracking(parent) {
 
-    function mixin(name, constructor) {
-        Tracking[name] = constructor(Tracking);
+        /** @member {Collectors} Tracking#collectors */
+        this.collectors = new Collectors(this, parent);
+
+        var collect = this.collectors.collect.bind(this.collectors),
+            decorate = this.collectors.decorate.bind(this.collectors);
+
+        /** @member {Errors} Tracking#errors */
+        this.errors = Errors(collect);
+
+        /** @member {Events} Tracking#events */
+        this.events = Events(collect);
+
+        /** @member {Timers} Tracking#timers */
+        this.timers = Timers(collect);
+
+        /** @member {Marks} Tracking#marks */
+        this.marks = Marks(collect);
+
+        /** @member {Static} Tracking#static */
+        this.static = new Static(collect, decorate);
+
+        /** @member {Network} Tracking#network */
+        this.network = Network(collect);
+
+        /**
+         * @member {Function} Tracking#generateUUID
+         * @description Invoke to generate a universally unique identifier.
+         */
+        this.generateUUID = generateUUID;
+
     }
 
-    /** @member {Collectors} Tracking.collectors */
-    mixin('collectors', Collectors);
-
-    /** @member {Errors} Tracking.errors */
-    mixin('errors', Errors);
-
-    /** @member {Events} Tracking.events */
-    mixin('events', Events);
-
-    /** @member {Timers} Tracking.timers */
-    mixin('timers', Timers);
-
-    /** @member {Marks} Tracking.marks */
-    mixin('marks', Marks);
-
-    /** @member {Static} Tracking.static */
-    mixin('static', Static);
-
-    /** @member {Network} Tracking.network */
-    mixin('network', Network);
-
     /**
-     * @member {Function} Tracking.generateUUID
-     * @description Invoke to generate a universally unique identifier.
+     * Create a new Tracking instance that inherits any decorators applied
+     * to the parent instance. Children can be created to any depth -- every
+     * TrackingInfo instance created by a child will be decorated by each of
+     * its ancestors, starting with the top-most ancestor and working down.
+     * @function Tracking#createChild
+     * @returns {Tracking} A new child Tracking instance that inherits any
+     *  decorators attached to the parent instance.
+     * @example
+     * var parent = Tracking;
+     * var child = Tracking.createChild();
+     * parent.collectors.decorate(function decorator(info) {
+     *   info.data.decoratedByParent = true;
+     * });
+     * child.events.fire('event label', {category: 'child event'});
+     * // the event TrackingInfo will be given a 'decoratedByParent'
+     * // property because a decorator was added to the parent instance
      */
-    Tracking.generateUUID = generateUUID;
+    Tracking.prototype.createChild = function createChild() {
+        return new Tracking(this);
+    };
 
-    return Tracking;
+    return new Tracking();
     
 });
