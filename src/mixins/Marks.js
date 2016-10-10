@@ -14,9 +14,13 @@ define([
         measures = [],
 
         hasLabel = function hasLabel(label) {
-            return function isMatch(prev, mark) {
-                return mark.label === label ? mark : prev;
+            return function isMatch(mark) {
+                return mark.label === label;
             };
+        },
+
+        isProvided = function isProvided(value) {
+            return value !== undefined && typeof value === 'string' && value.trim().length > 0;
         },
 
         getCounter = function getCounter(label) {
@@ -59,15 +63,45 @@ define([
 
         polyMeasure = function measure(name, start, stop, data, between) {
 
-            var instance,
-                mark1 = marks.reduce(hasLabel(start), null),
-                mark2 = marks.reduce(hasLabel(stop), null);
+            var i, instance, mark1, mark2, curr,
+                isStopMark = hasLabel(stop),
+                isStartMark = hasLabel(start),
+                startProvided = isProvided(start),
+                stopProvided = isProvided(stop),
 
-            if (typeof start !== 'string' || !start.length) {
-                mark1 = marks.reduce(hasLabel('navigationStart'), null);
+                shouldSetStartMark = function() {
+                    return !mark1 && isStartMark(curr);
+                },
+
+                okayToSetStartMark = function() {
+                    return !!mark2 || !stopProvided;
+                },
+
+                shouldSetStopMark = function() {
+                    return !mark2 && isStopMark(curr);
+                },
+
+                bothMarksSet = function() {
+                    return !!mark1 && !!mark2;
+                };
+
+            for (i = marks.length - 1; i >= 0; i--) {
+                curr = marks[i];
+                if (shouldSetStopMark()) {
+                    mark2 = curr;
+                } else if (shouldSetStartMark() && okayToSetStartMark()) {
+                    mark1 = curr;
+                }
+                if (bothMarksSet()) {
+                    break;
+                }
             }
 
-            if (typeof stop !== 'string' || !stop.length) {
+            if (!startProvided) {
+                mark1 = { stop: navStart };
+            }
+
+            if (!stopProvided) {
                 mark2 = { stop: Stopwatch.now() };
             }
 
