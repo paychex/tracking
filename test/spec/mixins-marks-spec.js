@@ -113,6 +113,31 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                 expect(Tracking.marks.set).toHaveBeenCalledWith('Start: ' + args[0], args[1]);
             });
 
+            it('returns a "stop" function with the same parameters passed in', function() {
+                var args = ['name', {custom: 'value'}],
+                    stopFn;
+
+                // Setup some spies
+                //
+                // Ignore any setup by ignoring set()
+                spyOn(Tracking.marks, 'set').and.returnValue(null);
+                //
+                // Need to spy on stop() to be sure it is called
+                spyOn(Tracking.marks, 'stop');
+
+                // Get a reference to the stop function
+                stopFn = Tracking.marks.start.apply(null, args);
+
+                // Check the type of the stop function
+                expect(stopFn).toEqual(jasmine.any(Function));
+
+                // Execute the stop function
+                stopFn();
+
+                // Check that Tracking.marks.stop was called with the correct parameters
+                expect(Tracking.marks.stop).toHaveBeenCalledWith(args[0], args[1]);
+            });
+
         });
 
         describe('stop', function() {

@@ -221,6 +221,11 @@ define([
          */
         Marks.start = function start(name, data) {
             Marks.set('Start: ' + name, data);
+
+            // Convenience function
+            return function stop() {
+                return Marks.stop(name, data);
+            };
         };
 
         /**
