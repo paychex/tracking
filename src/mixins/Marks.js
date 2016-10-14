@@ -212,6 +212,7 @@ define([
          * @param {String} name The name of the mark to set.
          * @param {Object} [data] Optional data to use to set properties
          *  on the {@link TrackingInfo} instance persisted to collectors.
+         * @returns {Function} A function which is the equivalent of Marks.stop(name, data);
          * @example
          * Tracking.marks.start('loading data');
          * $.getJSON('path/to/data')
