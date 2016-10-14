@@ -219,6 +219,10 @@ define([
          *   .success(function(data) {
          *     Tracking.marks.stop('loading data');
          *   });
+         *  // or
+         * var stop = Tracking.marks.start('loading data');
+         * $.getJSON('path/to/data')
+         *   .success(stop);
          */
         Marks.start = function start(name, data) {
             Marks.set('Start: ' + name, data);
