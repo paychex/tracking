@@ -258,7 +258,9 @@ define([
          *  // Or:
          * var stop = Tracking.marks.start('loading data');
          * $.getJSON('path/to/data')
-         *   .success(stop);
+         *   .success(function success() {
+         *     stop({result: 'success', data: data});
+         *   });
          * // If you prefer promises:
          * var stop = Tracking.marks.start('loading data', {category: 'loading'});
          * return doSomethingAsync().tap(function success(data) {
