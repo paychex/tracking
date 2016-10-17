@@ -171,25 +171,37 @@ define([
         },
 
         /**
-         * Overwrites base's values with override's and adds override's if non existent in base
-         * @param {Object} base The base object to merge
-         * @param {Object} override The second object to merge (overwrites members provided in base)
-         * @returns {Object} A new object based on base and override
+         * Creates an object whose members are merged in from the arguments, left to right.
+         * @param {Object...} The objects to merge together
+         * @returns {Object} A new object whose members are derrived from the objects passed in
+         * @example
+         * var eyeColor = {eyeColor: 'blue', name: 'eye color'};
+         * var hairColor = {hairColor: 'brown', name: 'hair color'};
+         * var height = {inches: 72, name: 'height'};
+         * var person = {name: 'Mr. T'};
+         *
+         * var person = merge(eyeColor, hairColor, height, person);
+         * // {
+         * //   eyeColor: 'blue',
+         * //   hairColor: 'brown',
+         * //   inches: 72,
+         * //   name: 'Mr. T'
+         * // }
+         *
          */
-        defaults = function defaults(base, override){
+        merge = function merge(/*Objects...*/){
+            // The result to return
             var result = {};
 
-            if (!!base) {
-                for (var attrname in base) {
-                    result[attrname] = base[attrname];
+            Array.prototype.slice.call(arguments).reduce(function (previousArgument, currentArgument) {
+                if (!!currentArgument && 'object' === typeof currentArgument) {
+                    Object.getOwnPropertyNames(currentArgument).reduce(function (previousValue, currentValue) {
+                        previousValue[currentValue] = currentArgument[currentValue];
+                        return previousValue;
+                    }, previousArgument);
                 }
-            }
-
-            if (!!override) {
-                for (var attrname in override) {
-                    result[attrname] = override[attrname];
-                }
-            }
+                return previousArgument;
+            }, result);
 
             return result;
         };
@@ -258,7 +270,7 @@ define([
 
             // Convenience function
             return function stop(overrides) {
-                return Marks.stop(name, defaults(data, overrides));
+                return Marks.stop(name, merge(data, overrides));
             };
         };
 

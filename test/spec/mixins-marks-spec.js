@@ -250,6 +250,37 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                     // Check that Tracking.marks.stop was called with the correct parameters
                     expect(Tracking.marks.stop).toHaveBeenCalledWith(name, combinedData);
                 });
+
+                it('returns a "stop" function with the same parameters passed in (undefined override values)', function() {
+                    var name = 'name',
+                        data = {custom: 'value'},
+                        overrideData = {custom: undefined},
+                        combinedData = {
+                            custom: undefined
+                        },
+                        stopFn;
+
+                    // Setup some spies
+                    //
+                    // Ignore any setup by ignoring set()
+                    spyOn(Tracking.marks, 'set').and.returnValue(null);
+                    //
+                    // Need to spy on stop() to be sure it is called
+                    spyOn(Tracking.marks, 'stop');
+
+                    // Get a reference to the stop function
+                    stopFn = Tracking.marks.start.apply(null, [name, data]);
+
+                    // Check the type of the stop function
+                    expect(stopFn).toEqual(jasmine.any(Function));
+
+                    // Execute the stop function
+                    stopFn(overrideData);
+
+                    // Check that Tracking.marks.stop was called with the correct parameters
+                    expect(Tracking.marks.stop).toHaveBeenCalledWith(name, combinedData);
+                });
+
             });
 
         });
