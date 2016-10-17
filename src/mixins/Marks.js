@@ -168,6 +168,30 @@ define([
                 }
             });
 
+        },
+
+        /**
+         * Overwrites base's values with override's and adds override's if non existent in base
+         * @param {Object} base The base object to merge
+         * @param {Object} override The second object to merge (overwrites members provided in base)
+         * @returns {Object} A new object based on base and override
+         */
+        defaults = function defaults(base, override){
+            var result = {};
+
+            if (!!base) {
+                for (var attrname in base) {
+                    result[attrname] = base[attrname];
+                }
+            }
+
+            if (!!override) {
+                for (var attrname in override) {
+                    result[attrname] = override[attrname];
+                }
+            }
+
+            return result;
         };
 
     /**
@@ -219,17 +243,22 @@ define([
          *   .success(function(data) {
          *     Tracking.marks.stop('loading data');
          *   });
-         *  // or
+         *  // Or:
          * var stop = Tracking.marks.start('loading data');
          * $.getJSON('path/to/data')
          *   .success(stop);
+         * // If you prefer promises:
+         * var stop = Tracking.marks.start('loading data', {category: 'loading'});
+         * return doSomethingAsync().tap(function success(data) {
+         *   stop({result: 'success', data: data});
+         * });
          */
         Marks.start = function start(name, data) {
             Marks.set('Start: ' + name, data);
 
             // Convenience function
-            return function stop() {
-                return Marks.stop(name, data);
+            return function stop(overrides) {
+                return Marks.stop(name, defaults(data, overrides));
             };
         };
 
