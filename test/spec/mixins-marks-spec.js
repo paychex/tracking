@@ -113,6 +113,176 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
                 expect(Tracking.marks.set).toHaveBeenCalledWith('Start: ' + args[0], args[1]);
             });
 
+            describe('returned "stop" function', function() {
+
+                it('returns a "stop" function with the same parameters passed in (no/undefined overrides)', function() {
+                    var args = ['name', {custom: 'value'}],
+                        stopFn;
+
+                    // Setup some spies
+                    //
+                    // Ignore any setup by ignoring set()
+                    spyOn(Tracking.marks, 'set').and.returnValue(null);
+                    //
+                    // Need to spy on stop() to be sure it is called
+                    spyOn(Tracking.marks, 'stop');
+
+                    // Get a reference to the stop function
+                    stopFn = Tracking.marks.start.apply(null, args);
+
+                    // Check the type of the stop function
+                    expect(stopFn).toEqual(jasmine.any(Function));
+
+                    // Execute the stop function
+                    stopFn();
+
+                    // Check that Tracking.marks.stop was called with the correct parameters
+                    expect(Tracking.marks.stop).toHaveBeenCalledWith(args[0], args[1]);
+                });
+
+                it('returns a "stop" function with the same parameters passed in (null overrides)', function() {
+                    var args = ['name', {custom: 'value'}],
+                        stopFn;
+
+                    // Setup some spies
+                    //
+                    // Ignore any setup by ignoring set()
+                    spyOn(Tracking.marks, 'set').and.returnValue(null);
+                    //
+                    // Need to spy on stop() to be sure it is called
+                    spyOn(Tracking.marks, 'stop');
+
+                    // Get a reference to the stop function
+                    stopFn = Tracking.marks.start.apply(null, args);
+
+                    // Check the type of the stop function
+                    expect(stopFn).toEqual(jasmine.any(Function));
+
+                    // Execute the stop function
+                    stopFn(null);
+
+                    // Check that Tracking.marks.stop was called with the correct parameters
+                    expect(Tracking.marks.stop).toHaveBeenCalledWith(args[0], args[1]);
+                });
+
+                it('returns a "stop" function with the same parameters passed in (empty overrides)', function() {
+                    var args = ['name', {custom: 'value'}],
+                        stopFn;
+
+                    // Setup some spies
+                    //
+                    // Ignore any setup by ignoring set()
+                    spyOn(Tracking.marks, 'set').and.returnValue(null);
+                    //
+                    // Need to spy on stop() to be sure it is called
+                    spyOn(Tracking.marks, 'stop');
+
+                    // Get a reference to the stop function
+                    stopFn = Tracking.marks.start.apply(null, args);
+
+                    // Check the type of the stop function
+                    expect(stopFn).toEqual(jasmine.any(Function));
+
+                    // Execute the stop function
+                    stopFn({});
+
+                    // Check that Tracking.marks.stop was called with the correct parameters
+                    expect(Tracking.marks.stop).toHaveBeenCalledWith(args[0], args[1]);
+                });
+
+                it('returns a "stop" function with the same parameters passed in (additional overrides)', function() {
+                    var name = 'name',
+                        data = {custom: 'value'},
+                        overrideData = {override: 'otherValue'},
+                        combinedData = {
+                            custom: 'value',
+                            override: 'otherValue'
+                        },
+                        stopFn;
+
+                    // Setup some spies
+                    //
+                    // Ignore any setup by ignoring set()
+                    spyOn(Tracking.marks, 'set').and.returnValue(null);
+                    //
+                    // Need to spy on stop() to be sure it is called
+                    spyOn(Tracking.marks, 'stop');
+
+                    // Get a reference to the stop function
+                    stopFn = Tracking.marks.start.apply(null, [name, data]);
+
+                    // Check the type of the stop function
+                    expect(stopFn).toEqual(jasmine.any(Function));
+
+                    // Execute the stop function
+                    stopFn(overrideData);
+
+                    // Check that Tracking.marks.stop was called with the correct parameters
+                    expect(Tracking.marks.stop).toHaveBeenCalledWith(name, combinedData);
+                });
+
+                it('returns a "stop" function with the same parameters passed in (proper overrides)', function() {
+                    var name = 'name',
+                        data = {custom: 'value'},
+                        overrideData = {custom: 'otherValue'},
+                        combinedData = {
+                            custom: 'otherValue'
+                        },
+                        stopFn;
+
+                    // Setup some spies
+                    //
+                    // Ignore any setup by ignoring set()
+                    spyOn(Tracking.marks, 'set').and.returnValue(null);
+                    //
+                    // Need to spy on stop() to be sure it is called
+                    spyOn(Tracking.marks, 'stop');
+
+                    // Get a reference to the stop function
+                    stopFn = Tracking.marks.start.apply(null, [name, data]);
+
+                    // Check the type of the stop function
+                    expect(stopFn).toEqual(jasmine.any(Function));
+
+                    // Execute the stop function
+                    stopFn(overrideData);
+
+                    // Check that Tracking.marks.stop was called with the correct parameters
+                    expect(Tracking.marks.stop).toHaveBeenCalledWith(name, combinedData);
+                });
+
+                it('returns a "stop" function with the same parameters passed in (undefined override values)', function() {
+                    var name = 'name',
+                        data = {custom: 'value'},
+                        overrideData = {custom: undefined},
+                        combinedData = {
+                            custom: undefined
+                        },
+                        stopFn;
+
+                    // Setup some spies
+                    //
+                    // Ignore any setup by ignoring set()
+                    spyOn(Tracking.marks, 'set').and.returnValue(null);
+                    //
+                    // Need to spy on stop() to be sure it is called
+                    spyOn(Tracking.marks, 'stop');
+
+                    // Get a reference to the stop function
+                    stopFn = Tracking.marks.start.apply(null, [name, data]);
+
+                    // Check the type of the stop function
+                    expect(stopFn).toEqual(jasmine.any(Function));
+
+                    // Execute the stop function
+                    stopFn(overrideData);
+
+                    // Check that Tracking.marks.stop was called with the correct parameters
+                    expect(Tracking.marks.stop).toHaveBeenCalledWith(name, combinedData);
+                });
+
+            });
+
         });
 
         describe('stop', function() {

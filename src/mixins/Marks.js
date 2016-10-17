@@ -168,6 +168,42 @@ define([
                 }
             });
 
+        },
+
+        /**
+         * Creates an object whose members are merged in from the arguments, left to right.
+         * @param {Object...} The objects to merge together
+         * @returns {Object} A new object whose members are derrived from the objects passed in
+         * @example
+         * var eyeColor = {eyeColor: 'blue', name: 'eye color'};
+         * var hairColor = {hairColor: 'brown', name: 'hair color'};
+         * var height = {inches: 72, name: 'height'};
+         * var person = {name: 'Mr. T'};
+         *
+         * var person = merge(eyeColor, hairColor, height, person);
+         * // {
+         * //   eyeColor: 'blue',
+         * //   hairColor: 'brown',
+         * //   inches: 72,
+         * //   name: 'Mr. T'
+         * // }
+         *
+         */
+        merge = function merge(/*Objects...*/){
+            // The result to return
+            var result = {};
+
+            Array.prototype.slice.call(arguments).reduce(function (previousArgument, currentArgument) {
+                if (!!currentArgument && 'object' === typeof currentArgument) {
+                    Object.getOwnPropertyNames(currentArgument).reduce(function (previousValue, currentValue) {
+                        previousValue[currentValue] = currentArgument[currentValue];
+                        return previousValue;
+                    }, previousArgument);
+                }
+                return previousArgument;
+            }, result);
+
+            return result;
         };
 
     /**
@@ -212,15 +248,32 @@ define([
          * @param {String} name The name of the mark to set.
          * @param {Object} [data] Optional data to use to set properties
          *  on the {@link TrackingInfo} instance persisted to collectors.
+         * @returns {Function} A function which is the equivalent of Marks.stop(name, data);
          * @example
          * Tracking.marks.start('loading data');
          * $.getJSON('path/to/data')
          *   .success(function(data) {
          *     Tracking.marks.stop('loading data');
          *   });
+         *  // Or:
+         * var stop = Tracking.marks.start('loading data');
+         * $.getJSON('path/to/data')
+         *   .success(function success() {
+         *     stop({result: 'success', data: data});
+         *   });
+         * // If you prefer promises:
+         * var stop = Tracking.marks.start('loading data', {category: 'loading'});
+         * return doSomethingAsync().tap(function success(data) {
+         *   stop({result: 'success', data: data});
+         * });
          */
         Marks.start = function start(name, data) {
             Marks.set('Start: ' + name, data);
+
+            // Convenience function
+            return function stop(overrides) {
+                return Marks.stop(name, merge(data, overrides));
+            };
         };
 
         /**
