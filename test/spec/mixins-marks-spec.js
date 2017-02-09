@@ -443,6 +443,31 @@ define(['Tracking', '../TestCollector'], function(Tracking, TestCollector) {
 
             });
 
+            it('correctly pairs out-of-sequence marks', function(done) {
+
+                function setter(label) {
+                    return function timeout() {
+                        Tracking.marks.set(label);
+                    }
+                }
+
+                this.expectInfo({label: 'stop', count: 1});
+                this.expectInfo({label: 'start', count: 1});
+                this.expectInfo({label: 'stop', count: 2});
+                this.expectInfo({label: 'measure'});
+
+                setTimeout(setter('stop'), 10);
+                setTimeout(setter('start'),  20);
+                setTimeout(setter('stop'), 30);
+
+                setTimeout(function verify() {
+                    Tracking.marks.measure('measure', 'start', 'stop');
+                    expect(Tracking.marks.getMeasures('measure')[0].duration).toBeGreaterThan(0);
+                    done();
+                }, 40);
+
+            });
+
             it('auto-increases count based on measure name', function() {
                 this.expectInfo({count: 1});
                 this.expectInfo({count: 2});
