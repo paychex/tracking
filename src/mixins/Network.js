@@ -38,7 +38,11 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
                     category: timing.initiatorType,
                     count: resourceCounts[timing.name] = (resourceCounts[timing.name] || 0) + 1,
                     data: {
+                        // see https://www.w3.org/TR/resource-timing-2/#dom-performanceresourcetiming-transfersize
+                        // for more information about the various size properties below
                         size: timing.transferSize, // NOTE: not all browsers provide transferSize
+                        encodedSize: timing.encodedBodySize, // NOTE: not all browsers provide encodedBodySize
+                        decodedSize: timing.decodedBodySize, // NOTE: not all browsers provide decodedBodySize
                         cachedOrLocal: timing.fetchStart === timing.connectEnd,
                         blockTime: Math.max(0, (timing.requestStart || timing.fetchStart) - timing.startTime),
                         stages: {
