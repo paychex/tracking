@@ -1,6 +1,6 @@
 {
   "name": "paychex-tracking",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Provides various tracking metrics for JavaScript applications.",
   "main": "index.js",
   "scripts": {
