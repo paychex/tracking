@@ -31,8 +31,12 @@ define(['../TrackingInfo'], function(TrackingInfo) {
                 type: 'error', data: error
             });
 
-            info.data.stack = error.stack; // need to invoke stack getter
-            
+            // need to copy values manually because
+            // Error properties are non-enumerable:
+            info.data.name = error.name;
+            info.data.stack = error.stack;
+            info.data.message = error.message;
+
             collect(info);
             
         };

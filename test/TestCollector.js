@@ -14,9 +14,13 @@ define([], function() {
         if (!expected) {
             throw new Error('No collections expected.');
         } else {
-            for(var key in expected) {
-                if (expected.hasOwnProperty(key)) {
-                    expect(info[key]).toEqual(expected[key]);
+            if (typeof expected === 'function') {
+                expected(info);
+            } else {
+                for(var key in expected) {
+                    if (expected.hasOwnProperty(key)) {
+                        expect(info[key]).toEqual(expected[key]);
+                    }
                 }
             }
         }
