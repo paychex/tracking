@@ -1,10 +1,10 @@
 {
   "name": "paychex-tracking",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Provides various tracking metrics for JavaScript applications.",
   "main": "index.js",
   "scripts": {
-    "doc": "./node_modules/.bin/jsdoc -d build/dev/doc -r -P ./package.json src",
+    "doc": "./node_modules/.bin/jsdoc -d build/doc -r -P ./package.json src",
     "pretest": "npm install",
     "test": "karma start karma.conf.js",
     "test-single-run": "karma start karma.conf.js --single-run",

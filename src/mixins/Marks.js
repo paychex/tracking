@@ -29,16 +29,7 @@ define([
             };
         },
 
-        navStart = (function() {
-
-            function exists(prev, key) {
-                return !!prev && !!prev[key] ? prev[key] : null;
-            }
-
-            return ['performance', 'timing', 'navigationStart']
-                .reduce(exists, window) || Stopwatch.now();
-
-        })(),
+        navStart = Stopwatch.navigationStart,
 
         polyMark = function mark(name, data, ignoreBuiltIn) {
 
@@ -172,8 +163,8 @@ define([
 
         /**
          * Creates an object whose members are merged in from the arguments, left to right.
-         * @param {Object...} The objects to merge together
-         * @returns {Object} A new object whose members are derrived from the objects passed in
+         * @param {...Object} objects The objects to merge together
+         * @returns {Object} A new object whose members are derived from the objects passed in
          * @example
          * var eyeColor = {eyeColor: 'blue', name: 'eye color'};
          * var hairColor = {hairColor: 'brown', name: 'hair color'};
@@ -408,8 +399,6 @@ define([
                 label: 'navigationStart'
             }];
         };
-
-        Marks.navigationStart = navStart;
 
         Marks.reset();
 

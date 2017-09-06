@@ -1,5 +1,5 @@
 /* global define, window, setInterval: false */
-define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
+define(['../TrackingInfo', '../Stopwatch'], function(TrackingInfo, Stopwatch) {
     
     'use strict';
     
@@ -25,16 +25,18 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
             lastLength = 0,
             resourceCounts = {},
             perf = window.performance,
+            navStart = Stopwatch.navigationStart,
             isInvalidTiming = function isInvalid(timing) {
-                return timing.responseEnd < timing.requestStart;
+                return timing.responseEnd < timing.requestStart ||
+                    timing.responseEnd < timing.startTime;
             },
             
             getTimingInfo = function getTimingInfo(timing) {
                 return new TrackingInfo({
                     type: 'network',
                     label: timing.name,
-                    start: Marks.navigationStart + timing.startTime,
-                    stop: Marks.navigationStart + timing.responseEnd,
+                    start: navStart + timing.startTime,
+                    stop: navStart + timing.responseEnd,
                     category: timing.initiatorType,
                     count: resourceCounts[timing.name] = (resourceCounts[timing.name] || 0) + 1,
                     data: {
@@ -47,28 +49,28 @@ define(['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
                         blockTime: Math.max(0, (timing.requestStart || timing.fetchStart) - timing.startTime),
                         stages: {
                             fetch: {
-                                start: Marks.navigationStart + timing.fetchStart,
-                                end: Marks.navigationStart + timing.domainLookupStart,
+                                start: navStart + timing.fetchStart,
+                                end: navStart + timing.domainLookupStart,
                                 duration: timing.domainLookupStart - timing.fetchStart
                             },
                             dns: {
-                                start: Marks.navigationStart + timing.domainLookupStart,
-                                end: Marks.navigationStart + timing.domainLookupEnd,
+                                start: navStart + timing.domainLookupStart,
+                                end: navStart + timing.domainLookupEnd,
                                 duration: timing.domainLookupEnd - timing.domainLookupStart
                             },
                             tcp: {
-                                start: Marks.navigationStart + timing.connectStart,
-                                end: Marks.navigationStart + timing.connectEnd,
+                                start: navStart + timing.connectStart,
+                                end: navStart + timing.connectEnd,
                                 duration: timing.connectEnd - timing.connectStart
                             },
                             request: {
-                                start: Marks.navigationStart + timing.requestStart,
-                                end: Marks.navigationStart + timing.responseStart,
+                                start: navStart + timing.requestStart,
+                                end: navStart + timing.responseStart,
                                 duration: timing.responseStart - timing.requestStart
                             },
                             response: {
-                                start: Marks.navigationStart + timing.responseStart,
-                                end: Marks.navigationStart + timing.responseEnd,
+                                start: navStart + timing.responseStart,
+                                end: navStart + timing.responseEnd,
                                 duration: timing.responseEnd - timing.responseStart
                             }
                         }

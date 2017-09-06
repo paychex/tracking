@@ -443,6 +443,8 @@ define("../node_modules/almond/almond", function(){});
 define('Stopwatch',[], function() {
     
     'use strict';
+
+    var perf = window.performance || {};
     
     /**
      * Static class that provides access to the current
@@ -451,6 +453,32 @@ define('Stopwatch',[], function() {
      * @static
      */
     function Stopwatch() {}
+
+    /**
+     * The epoch time when the user first navigated to the page.
+     * @member {number} Stopwatch.navigationStart
+     */
+    Stopwatch.navigationStart = (function getNavStart() {
+        if (perf.timing) {
+            return perf.timing.navigationStart;
+        }
+        if (Date.now) {
+            return Date.now();
+        }
+        return new Date().getTime();
+    })();
+
+    /**
+     * Returns the number of milliseconds since the user navigated to the page.
+     * @function Stopwatch.elapsed
+     * @returns {number}
+     */
+    Stopwatch.elapsed = function elapsed() {
+        if (perf.now) {
+            return perf.now();
+        }
+        return Math.abs(Date.now() - Stopwatch.navigationStart);
+    };
     
     /**
      * Returns the current epoch time (the number of
@@ -467,8 +495,8 @@ define('Stopwatch',[], function() {
      *   });
      * });
      */
-    Stopwatch.now = Date.now || function getTime() {
-        return new Date().getTime();
+    Stopwatch.now = function getNow() {
+        return Stopwatch.navigationStart + Stopwatch.elapsed();
     };
     
     return Stopwatch;
@@ -694,8 +722,12 @@ define('mixins/Errors',['../TrackingInfo'], function(TrackingInfo) {
                 type: 'error', data: error
             });
 
-            info.data.stack = error.stack; // need to invoke stack getter
-            
+            // need to copy values manually because
+            // Error properties are non-enumerable:
+            info.data.name = error.name;
+            info.data.stack = error.stack;
+            info.data.message = error.message;
+
             collect(info);
             
         };
@@ -1030,16 +1062,7 @@ define('mixins/Marks',[
             };
         },
 
-        navStart = (function() {
-
-            function exists(prev, key) {
-                return !!prev && !!prev[key] ? prev[key] : null;
-            }
-
-            return ['performance', 'timing', 'navigationStart']
-                .reduce(exists, window) || Stopwatch.now();
-
-        })(),
+        navStart = Stopwatch.navigationStart,
 
         polyMark = function mark(name, data, ignoreBuiltIn) {
 
@@ -1173,8 +1196,8 @@ define('mixins/Marks',[
 
         /**
          * Creates an object whose members are merged in from the arguments, left to right.
-         * @param {Object...} The objects to merge together
-         * @returns {Object} A new object whose members are derrived from the objects passed in
+         * @param {...Object} objects The objects to merge together
+         * @returns {Object} A new object whose members are derived from the objects passed in
          * @example
          * var eyeColor = {eyeColor: 'blue', name: 'eye color'};
          * var hairColor = {hairColor: 'brown', name: 'hair color'};
@@ -1410,8 +1433,6 @@ define('mixins/Marks',[
             }];
         };
 
-        Marks.navigationStart = navStart;
-
         Marks.reset();
 
         return Marks;
@@ -1421,7 +1442,7 @@ define('mixins/Marks',[
 });
 
 /* global define, window, setInterval: false */
-define('mixins/Network',['../TrackingInfo', './Marks'], function(TrackingInfo, Marks) {
+define('mixins/Network',['../TrackingInfo', '../Stopwatch'], function(TrackingInfo, Stopwatch) {
     
     'use strict';
     
@@ -1447,16 +1468,18 @@ define('mixins/Network',['../TrackingInfo', './Marks'], function(TrackingInfo, M
             lastLength = 0,
             resourceCounts = {},
             perf = window.performance,
+            navStart = Stopwatch.navigationStart,
             isInvalidTiming = function isInvalid(timing) {
-                return timing.responseEnd < timing.requestStart;
+                return timing.responseEnd < timing.requestStart ||
+                    timing.responseEnd < timing.startTime;
             },
             
             getTimingInfo = function getTimingInfo(timing) {
                 return new TrackingInfo({
                     type: 'network',
                     label: timing.name,
-                    start: Marks.navigationStart + timing.startTime,
-                    stop: Marks.navigationStart + timing.responseEnd,
+                    start: navStart + timing.startTime,
+                    stop: navStart + timing.responseEnd,
                     category: timing.initiatorType,
                     count: resourceCounts[timing.name] = (resourceCounts[timing.name] || 0) + 1,
                     data: {
@@ -1469,28 +1492,28 @@ define('mixins/Network',['../TrackingInfo', './Marks'], function(TrackingInfo, M
                         blockTime: Math.max(0, (timing.requestStart || timing.fetchStart) - timing.startTime),
                         stages: {
                             fetch: {
-                                start: Marks.navigationStart + timing.fetchStart,
-                                end: Marks.navigationStart + timing.domainLookupStart,
+                                start: navStart + timing.fetchStart,
+                                end: navStart + timing.domainLookupStart,
                                 duration: timing.domainLookupStart - timing.fetchStart
                             },
                             dns: {
-                                start: Marks.navigationStart + timing.domainLookupStart,
-                                end: Marks.navigationStart + timing.domainLookupEnd,
+                                start: navStart + timing.domainLookupStart,
+                                end: navStart + timing.domainLookupEnd,
                                 duration: timing.domainLookupEnd - timing.domainLookupStart
                             },
                             tcp: {
-                                start: Marks.navigationStart + timing.connectStart,
-                                end: Marks.navigationStart + timing.connectEnd,
+                                start: navStart + timing.connectStart,
+                                end: navStart + timing.connectEnd,
                                 duration: timing.connectEnd - timing.connectStart
                             },
                             request: {
-                                start: Marks.navigationStart + timing.requestStart,
-                                end: Marks.navigationStart + timing.responseStart,
+                                start: navStart + timing.requestStart,
+                                end: navStart + timing.responseStart,
                                 duration: timing.responseStart - timing.requestStart
                             },
                             response: {
-                                start: Marks.navigationStart + timing.responseStart,
-                                end: Marks.navigationStart + timing.responseEnd,
+                                start: navStart + timing.responseStart,
+                                end: navStart + timing.responseEnd,
                                 duration: timing.responseEnd - timing.responseStart
                             }
                         }
